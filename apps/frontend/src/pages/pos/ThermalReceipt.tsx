@@ -51,6 +51,55 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   giftCard: 'بطاقة هدايا (Gift Card)',
 };
 
+export function renderPrintHtml(html: string, windowWidth: number = 800, windowHeight: number = 750) {
+  let printWindow: Window | null = null;
+  try {
+    printWindow = window.open('', '_blank', `width=${windowWidth},height=${windowHeight},scrollbars=yes,resizable=yes`);
+  } catch {
+    printWindow = null;
+  }
+
+  if (printWindow && !printWindow.closed) {
+    try {
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+      return;
+    } catch (e) {
+      console.warn('Direct popup write failed, falling back to iframe', e);
+    }
+  }
+
+  // Fallback for mobile browsers (iOS Safari, Android Chrome) where popups are blocked by default:
+  let iframe = document.getElementById('smartpos-print-hidden-iframe') as HTMLIFrameElement;
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'smartpos-print-hidden-iframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+  }
+
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(html);
+      doc.close();
+      return;
+    }
+  } catch (err) {
+    console.error('Iframe print error', err);
+  }
+
+  alert('يرجى السماح بالنوافذ المنبثقة (Pop-ups) لمعاينة وطباعة الفاتورة.');
+}
+
 // ==========================================
 // 1. THERMAL RECEIPT (80mm & 58mm) - طباعة إيصال كاشير حراري
 // ==========================================
@@ -59,11 +108,6 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
   const is58 = paperSize === '58mm';
 
   const windowWidth = is58 ? 400 : 480;
-  const printWindow = window.open('', '_blank', `width=${windowWidth},height=750`);
-  if (!printWindow) {
-    alert('يرجى السماح بالنوافذ المنبثقة (Pop-ups) لمعاينة وطباعة الفاتورة.');
-    return;
-  }
 
   const paymentMethodKey = (data.paymentMethod || 'cash').toLowerCase();
   const paymentLabel = PAYMENT_METHOD_LABELS[paymentMethodKey] || data.paymentMethod || 'نقداً';
@@ -178,6 +222,13 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
         }
         .btn-print:hover {
           background: #15803d;
+        }
+        .btn-share {
+          background: #0284c7;
+          color: #fff;
+        }
+        .btn-share:hover {
+          background: #0369a1;
         }
         .btn-size {
           background: rgba(255,255,255,0.18);
@@ -371,6 +422,7 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
           </div>
         </div>
         <div style="display: flex; gap: 8px;">
+          <button class="btn-share" onclick="shareReceipt()">مشاركة 📤</button>
           <button class="btn-print" onclick="window.print()">طباعة الإيصال</button>
           <button class="btn-close" onclick="window.close()">إغلاق</button>
         </div>
@@ -503,6 +555,23 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
           }
         }
 
+        function shareReceipt() {
+          if (navigator.share) {
+            navigator.share({
+              title: 'إيصال فاتورة #${data.invoiceNumber}',
+              text: 'إيصال فاتورة #${data.invoiceNumber} من ${data.storeName || 'Smart POS'} بمبلغ ${grandTotalVal.toFixed(2)} ج.م',
+              url: window.location.href
+            }).catch(function(e) { console.log('Share canceled', e); });
+          } else {
+            try {
+              navigator.clipboard.writeText('إيصال فاتورة #${data.invoiceNumber} من ${data.storeName || 'Smart POS'} بمبلغ ${grandTotalVal.toFixed(2)} ج.م');
+              alert('تم نسخ تفاصيل الفاتورة للحافظة لمشاركتها.');
+            } catch (err) {
+              alert('إيصال فاتورة #${data.invoiceNumber} بمبلغ ${grandTotalVal.toFixed(2)} ج.م');
+            }
+          }
+        }
+
         window.addEventListener('load', function() {
           if (document.fonts) {
             document.fonts.ready.then(function() {
@@ -517,21 +586,13 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
     </html>
   `;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  renderPrintHtml(html, windowWidth, 750);
 }
 
 // ==========================================
 // 2. OFFICIAL A4 TAX INVOICE - طباعة فاتورة ضريبية رسمية A4
 // ==========================================
 export function printA4Invoice(data: ThermalReceiptProps) {
-  const printWindow = window.open('', '_blank', 'width=960,height=820');
-  if (!printWindow) {
-    alert('يرجى السماح بالنوافذ المنبثقة (Pop-ups) لمعاينة وطباعة الفاتورة.');
-    return;
-  }
-
   const paymentMethodKey = (data.paymentMethod || 'cash').toLowerCase();
   const paymentLabel = PAYMENT_METHOD_LABELS[paymentMethodKey] || data.paymentMethod || 'نقداً';
 
@@ -651,6 +712,16 @@ export function printA4Invoice(data: ThermalReceiptProps) {
         }
         .btn-print:hover {
           background: #4338ca;
+        }
+        .btn-share {
+          background: #0284c7;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .btn-share:hover {
+          background: #0369a1;
         }
         .btn-close {
           background: rgba(255,255,255,0.15);
@@ -940,6 +1011,9 @@ export function printA4Invoice(data: ThermalReceiptProps) {
           <span style="font-size: 11px; background: rgba(255,255,255,0.18); padding: 2px 8px; border-radius: 4px;">Standard A4</span>
         </div>
         <div style="display: flex; gap: 10px;">
+          <button class="btn-share" onclick="shareInvoice()">
+            <span>📤 مشاركة</span>
+          </button>
           <button class="btn-print" onclick="window.print()">
             <span>🖨️ طباعة الفاتورة A4</span>
           </button>
@@ -1143,6 +1217,23 @@ export function printA4Invoice(data: ThermalReceiptProps) {
       </div>
 
       <script>
+        function shareInvoice() {
+          if (navigator.share) {
+            navigator.share({
+              title: 'فاتورة ضريبية #${data.invoiceNumber}',
+              text: 'فاتورة ضريبية #${data.invoiceNumber} من ${data.storeName || 'Smart POS'} بمبلغ ${grandTotalVal.toFixed(2)} ج.م',
+              url: window.location.href
+            }).catch(function(e) { console.log('Share canceled', e); });
+          } else {
+            try {
+              navigator.clipboard.writeText('فاتورة ضريبية #${data.invoiceNumber} من ${data.storeName || 'Smart POS'} بمبلغ ${grandTotalVal.toFixed(2)} ج.م');
+              alert('تم نسخ تفاصيل الفاتورة للحافظة لمشاركتها.');
+            } catch (err) {
+              alert('فاتورة ضريبية #${data.invoiceNumber} بمبلغ ${grandTotalVal.toFixed(2)} ج.م');
+            }
+          }
+        }
+
         window.addEventListener('load', function() {
           if (document.fonts) {
             document.fonts.ready.then(function() {
@@ -1157,7 +1248,5 @@ export function printA4Invoice(data: ThermalReceiptProps) {
     </html>
   `;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  renderPrintHtml(html, 960, 820);
 }

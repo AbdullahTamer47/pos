@@ -4,7 +4,8 @@
  * and provides Kitchen Order printing for restaurant / order tickets.
  */
 
-export { printThermalReceipt, printA4Invoice } from '../pages/pos/ThermalReceipt';
+import { renderPrintHtml } from '../pages/pos/ThermalReceipt';
+export { printThermalReceipt, printA4Invoice, renderPrintHtml } from '../pages/pos/ThermalReceipt';
 export type { ThermalReceiptProps } from '../pages/pos/ThermalReceipt';
 
 export interface KitchenOrderItem {
@@ -53,24 +54,8 @@ function formatTime(dateStr: string): string {
   }
 }
 
-function openPrintWindow(html: string, title: string): void {
-  const printWindow = window.open('', '_blank', 'width=800,height=600');
-  if (!printWindow) {
-    alert('يرجى السماح بالنوافذ المنبثقة للطباعة (Please allow pop-ups for printing)');
-    return;
-  }
-
-  printWindow.document.write(html);
-  printWindow.document.title = title;
-  printWindow.document.close();
-
-  printWindow.onload = () => {
-    printWindow.focus();
-  };
-
-  printWindow.onafterprint = () => {
-    printWindow.close();
-  };
+function openPrintWindow(html: string, _title: string): void {
+  renderPrintHtml(html, 800, 600);
 }
 
 export function printKitchenOrder(order: KitchenOrder): void {
@@ -189,6 +174,11 @@ export function printKitchenOrder(order: KitchenOrder): void {
 </head>
 <body>
   ${lines.join('\n')}
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() { window.print(); }, 250);
+    });
+  </script>
 </body>
 </html>`;
 

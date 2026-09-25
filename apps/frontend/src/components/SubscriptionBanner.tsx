@@ -71,27 +71,42 @@ export function SubscriptionBanner() {
       icon={icon}
       sx={{
         borderRadius: 0,
-        alignItems: 'center',
-        py: 1,
-        px: 2.5,
-        '& .MuiAlert-message': { width: '100%' },
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        py: { xs: 1.5, sm: 1 },
+        px: { xs: 2, sm: 2.5 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 1.5, sm: 0 },
+        '& .MuiAlert-icon': {
+          mr: { xs: 0, sm: 1 },
+          mb: { xs: 0.5, sm: 0 },
+        },
+        '& .MuiAlert-message': { width: '100%', p: 0 },
+        '& .MuiAlert-action': {
+          pt: { xs: 0.5, sm: 0 },
+          pl: 0,
+          mr: 0,
+          alignSelf: { xs: 'stretch', sm: 'center' },
+          width: { xs: '100%', sm: 'auto' },
+        },
         ...(severity === 'error' && {
           bgcolor: (theme) => alpha(theme.palette.error.main, 0.12),
         }),
       }}
       action={
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
           <Button
             color="success"
             size="small"
             variant="contained"
             startIcon={<WhatsAppIcon />}
             onClick={handleRenewViaWhatsApp}
+            fullWidth
             sx={{
               fontWeight: 700,
               whiteSpace: 'nowrap',
               bgcolor: '#25D366',
               color: '#fff',
+              width: { xs: '100%', sm: 'auto' },
               '&:hover': { bgcolor: '#1EBE5D' },
             }}
           >

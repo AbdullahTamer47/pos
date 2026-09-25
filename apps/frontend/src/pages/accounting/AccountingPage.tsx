@@ -3,7 +3,7 @@ import {
   Box, Tabs, Tab, Typography, Button, Card, CardContent, Stack, TextField, Dialog,
   DialogTitle, DialogContent, DialogActions, IconButton, Chip, Table, TableBody,
   TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, MenuItem,
-  Skeleton, Alert, Switch, alpha, useTheme, Tooltip, InputAdornment,
+  Skeleton, Alert, Switch, alpha, useTheme, Tooltip, InputAdornment, useMediaQuery,
 } from '@mui/material';
 import {
   Add, Edit, Delete, Search, Close, FilterList, Refresh, Upload,
@@ -72,6 +72,7 @@ const TAB_LABELS = ['shifts', 'expenses', 'revenues', 'taxConfig'];
 export default function AccountingPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const [tab, setTab] = useState(0);
   const [page, setPage] = useState(0);
@@ -286,7 +287,7 @@ export default function AccountingPage() {
       ) : (
         <>
           <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>{t('shifts.shiftNumber')}</TableCell>
@@ -339,12 +340,10 @@ export default function AccountingPage() {
 
   const renderExpensesTab = () => (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap mb={2}>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          <TextField size="small" placeholder={t('common.search')} value={search} onChange={(e) => setSearch(e.target.value)}
-            InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} sx={{ minWidth: 200 }} />
-        </Stack>
-        <Button variant="contained" startIcon={<Add />} onClick={() => { setEditExpense(null); setExpenseDialog(true); }}>{t('expenses.addExpense')}</Button>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} gap={1.5} mb={2}>
+        <TextField size="small" placeholder={t('common.search')} value={search} onChange={(e) => setSearch(e.target.value)}
+          InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} sx={{ width: { xs: '100%', sm: 240 } }} />
+        <Button variant="contained" fullWidth={isMobile} startIcon={<Add />} onClick={() => { setEditExpense(null); setExpenseDialog(true); }}>{t('expenses.addExpense')}</Button>
       </Stack>
       {expensesLoading ? (
         <Stack spacing={1}>{[...Array(5)].map((_, i) => <Skeleton key={i} variant="rounded" height={48} />)}</Stack>
@@ -353,7 +352,7 @@ export default function AccountingPage() {
       ) : (
         <>
           <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>{t('common.date')}</TableCell>
@@ -387,12 +386,10 @@ export default function AccountingPage() {
 
   const renderRevenuesTab = () => (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap mb={2}>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          <TextField size="small" placeholder={t('common.search')} value={search} onChange={(e) => setSearch(e.target.value)}
-            InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} sx={{ minWidth: 200 }} />
-        </Stack>
-        <Button variant="contained" startIcon={<Add />} onClick={() => { setEditRevenue(null); setRevenueDialog(true); }}>{t('revenues.addRevenue')}</Button>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} gap={1.5} mb={2}>
+        <TextField size="small" placeholder={t('common.search')} value={search} onChange={(e) => setSearch(e.target.value)}
+          InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} sx={{ width: { xs: '100%', sm: 240 } }} />
+        <Button variant="contained" fullWidth={isMobile} startIcon={<Add />} onClick={() => { setEditRevenue(null); setRevenueDialog(true); }}>{t('revenues.addRevenue')}</Button>
       </Stack>
       {revenuesLoading ? (
         <Stack spacing={1}>{[...Array(5)].map((_, i) => <Skeleton key={i} variant="rounded" height={48} />)}</Stack>
@@ -401,7 +398,7 @@ export default function AccountingPage() {
       ) : (
         <>
           <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>{t('common.date')}</TableCell>
@@ -436,7 +433,7 @@ export default function AccountingPage() {
   const renderTaxConfigTab = () => (
     <Box>
       <Stack direction="row" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" startIcon={<Add />} onClick={() => { setEditTax(null); setTaxDialog(true); }}>{t('settings.addTax')}</Button>
+        <Button variant="contained" fullWidth={isMobile} startIcon={<Add />} onClick={() => { setEditTax(null); setTaxDialog(true); }}>{t('settings.addTax')}</Button>
       </Stack>
       {taxLoading ? (
         <Stack spacing={1}>{[...Array(5)].map((_, i) => <Skeleton key={i} variant="rounded" height={48} />)}</Stack>
@@ -445,7 +442,7 @@ export default function AccountingPage() {
       ) : (
         <>
           <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>{t('settings.taxName')}</TableCell>
@@ -595,7 +592,14 @@ export default function AccountingPage() {
         </Card>
       </Box>
 
-      <Tabs value={tab} onChange={(_, v) => { setTab(v); setPage(0); setSearch(''); }} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
+      <Tabs
+        value={tab}
+        onChange={(_, v) => { setTab(v); setPage(0); setSearch(''); }}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+      >
         {TAB_LABELS.map((label) => (
           <Tab key={label} label={t(`nav.${label === 'taxConfig' ? 'tax' : label}`)} />
         ))}
@@ -607,9 +611,9 @@ export default function AccountingPage() {
       {tab === 3 && renderTaxConfigTab()}
 
       {/* Open Shift Dialog */}
-      <Dialog open={openShiftDialog} onClose={() => setOpenShiftDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('shifts.openShift')}</DialogTitle>
-        <DialogContent>
+      <Dialog open={openShiftDialog} onClose={() => setOpenShiftDialog(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('shifts.openShift')}</DialogTitle>
+        <DialogContent dividers>
           <Stack spacing={2} mt={1}>
             <TextField
               label="الرصيد الافتتاحي (اختياري - افتراضياً 0 ج.م)"
@@ -630,16 +634,16 @@ export default function AccountingPage() {
             <TextField label="ملاحظات (اختياري)" {...openShiftForm.register('notes')} multiline rows={2} size="small" fullWidth placeholder="مثال: وردية مسائية" />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => setOpenShiftDialog(false)}>{t('common.cancel')}</Button>
           <Button variant="contained" onClick={openShiftForm.handleSubmit((d) => openShiftMut.mutate(d))} disabled={openShiftMut.isPending}>{t('common.save')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Close Shift Dialog */}
-      <Dialog open={closeShiftDialog} onClose={() => setCloseShiftDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('shifts.closeShift')}</DialogTitle>
-        <DialogContent>
+      <Dialog open={closeShiftDialog} onClose={() => setCloseShiftDialog(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('shifts.closeShift')}</DialogTitle>
+        <DialogContent dividers>
           <Stack spacing={2} mt={1}>
             {currentShift && (
               <>
@@ -654,16 +658,16 @@ export default function AccountingPage() {
             <TextField label={t('common.notes')} {...closeShiftForm.register('notes')} multiline rows={2} size="small" fullWidth />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => setCloseShiftDialog(false)}>{t('common.cancel')}</Button>
           <Button variant="contained" color="warning" onClick={closeShiftForm.handleSubmit((d) => closeShiftMut.mutate(d))} disabled={closeShiftMut.isPending}>{t('common.confirm')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Expense Dialog */}
-      <Dialog open={expenseDialog} onClose={() => { setExpenseDialog(false); setEditExpense(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle>{editExpense ? t('expenses.editExpense') : t('expenses.addExpense')}</DialogTitle>
-        <DialogContent>
+      <Dialog open={expenseDialog} onClose={() => { setExpenseDialog(false); setEditExpense(null); }} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{editExpense ? t('expenses.editExpense') : t('expenses.addExpense')}</DialogTitle>
+        <DialogContent dividers>
           <Stack spacing={2} mt={1}>
             <TextField label={t('expenses.expenseName')} {...expenseForm.register('name')} size="small" fullWidth />
             <TextField label={t('common.amount')} type="number" {...expenseForm.register('amount')} size="small" fullWidth />
@@ -672,16 +676,16 @@ export default function AccountingPage() {
             <TextField label={t('payments.paymentReference')} {...expenseForm.register('reference')} size="small" fullWidth />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => { setExpenseDialog(false); setEditExpense(null); }}>{t('common.cancel')}</Button>
           <Button variant="contained" onClick={expenseForm.handleSubmit((d) => editExpense ? updateExpenseMut.mutate({ id: editExpense.id, data: d }) : createExpenseMut.mutate(d))} disabled={createExpenseMut.isPending || updateExpenseMut.isPending}>{t('common.save')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Revenue Dialog */}
-      <Dialog open={revenueDialog} onClose={() => { setRevenueDialog(false); setEditRevenue(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle>{editRevenue ? t('revenues.editRevenue') : t('revenues.addRevenue')}</DialogTitle>
-        <DialogContent>
+      <Dialog open={revenueDialog} onClose={() => { setRevenueDialog(false); setEditRevenue(null); }} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{editRevenue ? t('revenues.editRevenue') : t('revenues.addRevenue')}</DialogTitle>
+        <DialogContent dividers>
           <Stack spacing={2} mt={1}>
             <TextField label={t('revenues.revenueName')} {...revenueForm.register('name')} size="small" fullWidth />
             <TextField label={t('common.amount')} type="number" {...revenueForm.register('amount')} size="small" fullWidth />
@@ -690,16 +694,16 @@ export default function AccountingPage() {
             <TextField label={t('payments.paymentReference')} {...revenueForm.register('reference')} size="small" fullWidth />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => { setRevenueDialog(false); setEditRevenue(null); }}>{t('common.cancel')}</Button>
           <Button variant="contained" onClick={revenueForm.handleSubmit((d) => editRevenue ? updateRevenueMut.mutate({ id: editRevenue.id, data: d }) : createRevenueMut.mutate(d))} disabled={createRevenueMut.isPending || updateRevenueMut.isPending}>{t('common.save')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Tax Config Dialog */}
-      <Dialog open={taxDialog} onClose={() => { setTaxDialog(false); setEditTax(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle>{editTax ? t('common.edit') : t('settings.addTax')}</DialogTitle>
-        <DialogContent>
+      <Dialog open={taxDialog} onClose={() => { setTaxDialog(false); setEditTax(null); }} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{editTax ? t('common.edit') : t('settings.addTax')}</DialogTitle>
+        <DialogContent dividers>
           <Stack spacing={2} mt={1}>
             <TextField label={t('settings.taxName')} {...taxForm.register('name')} size="small" fullWidth />
             <TextField label={t('settings.taxRate')} type="number" {...taxForm.register('rate')} size="small" fullWidth InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }} />
@@ -710,7 +714,7 @@ export default function AccountingPage() {
             </Stack>
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => { setTaxDialog(false); setEditTax(null); }}>{t('common.cancel')}</Button>
           <Button variant="contained" onClick={taxForm.handleSubmit((d) => editTax ? updateTaxMut.mutate({ id: editTax.id, data: d }) : createTaxMut.mutate(d))} disabled={createTaxMut.isPending || updateTaxMut.isPending}>{t('common.save')}</Button>
         </DialogActions>

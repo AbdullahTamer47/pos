@@ -4,7 +4,7 @@ import {
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination, TableSortLabel, Paper, Dialog, DialogTitle, DialogContent,
   DialogContentText, DialogActions, Alert, Avatar, alpha, useTheme,
-  Accordion, AccordionSummary, AccordionDetails,
+  Accordion, AccordionSummary, AccordionDetails, useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon,
@@ -50,6 +50,7 @@ function debounce(fn: (value: string) => void, delay: number): (value: string) =
 export default function SuppliersPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -144,20 +145,20 @@ export default function SuppliersPage() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={3} gap={2}>
         <Typography variant="h4" fontWeight={700}>{t('nav.suppliers')}</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" onClick={() => navigate('/purchase-orders')}>{t('nav.purchaseOrders')}</Button>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>{t('suppliers.addSupplier')}</Button>
+        <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Button variant="outlined" fullWidth={isMobile} onClick={() => navigate('/purchase-orders')}>{t('nav.purchaseOrders')}</Button>
+          <Button variant="contained" fullWidth={isMobile} startIcon={<AddIcon />} onClick={handleOpenAdd}>{t('suppliers.addSupplier')}</Button>
         </Stack>
       </Stack>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems="flex-start">
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
         <TextField
           size="small" placeholder={t('common.search')} value={search} onChange={handleSearchChange}
           InputProps={{
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <Chip label={t('common.active')} onClick={() => setStatusFilter(statusFilter === true ? null : true)} onDelete={statusFilter === true ? () => setStatusFilter(null) : undefined} variant={statusFilter === true ? 'filled' : 'outlined'} color={statusFilter === true ? 'success' : 'default'} />
@@ -175,7 +176,7 @@ export default function SuppliersPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox" />
@@ -256,10 +257,10 @@ export default function SuppliersPage() {
         )}
       </Paper>
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingSupplier ? t('suppliers.editSupplier') : t('suppliers.addSupplier')}</DialogTitle>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{editingSupplier ? t('suppliers.editSupplier') : t('suppliers.addSupplier')}</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
+          <DialogContent dividers>
             <Stack spacing={2}>
               <TextField
                 label={`${t('suppliers.supplierName')} *`}
@@ -290,13 +291,13 @@ export default function SuppliersPage() {
                   <Stack spacing={2}>
                     <TextField label={`${t('common.email')} (اختياري)`} fullWidth type="email" {...register('email')} error={!!errors.email} helperText={errors.email?.message} />
                     <TextField label={`${t('suppliers.contactPerson')} (اختياري)`} fullWidth {...register('contactPerson')} />
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                       <TextField label={`${t('suppliers.taxNumber')} (اختياري)`} fullWidth {...register('taxNumber')} />
                       <TextField label={`${t('suppliers.paymentTerms')} (اختياري)`} fullWidth {...register('paymentTerms')} />
                     </Stack>
                     <TextField label={`${t('suppliers.creditLimit')} (اختياري)`} fullWidth type="number" {...register('creditLimit', { valueAsNumber: true })} error={!!errors.creditLimit} helperText={errors.creditLimit?.message} />
                     <TextField label={`${t('common.address')} (اختياري)`} fullWidth {...register('address')} />
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                       <TextField label={`${t('common.city')} (اختياري)`} fullWidth {...register('city')} />
                       <TextField label={`${t('common.country')} (اختياري)`} fullWidth {...register('country')} />
                     </Stack>
@@ -306,7 +307,7 @@ export default function SuppliersPage() {
               </Accordion>
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
             <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
             <Button type="submit" variant="contained" disabled={isPending}>{isPending ? t('common.processing') : t('common.save')}</Button>
           </DialogActions>

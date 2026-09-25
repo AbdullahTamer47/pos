@@ -4,7 +4,7 @@ import {
   TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, Chip,
   IconButton, Skeleton, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
   Switch, FormControlLabel, Checkbox, FormGroup, Divider, InputAdornment, MenuItem,
-  Grid, Tab, Tabs,
+  Grid, Tab, Tabs, useTheme, useMediaQuery,
 } from '@mui/material';
 import {
   Add, Edit, Delete, Search, Close, FilterList, Refresh, ToggleOn, ToggleOff,
@@ -73,6 +73,8 @@ const OPERATION_PERMISSIONS = [
 
 export default function UserManagementPage() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -202,7 +204,7 @@ export default function UserManagementPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap mb={3}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} flexWrap="wrap" useFlexGap gap={2} mb={3}>
         <Box>
           <Typography variant="h4" fontWeight={700}>إدارة المستخدمين والكاشير</Typography>
           <Typography variant="body2" color="text.secondary">
@@ -211,6 +213,7 @@ export default function UserManagementPage() {
         </Box>
         <Button
           variant="contained"
+          fullWidth={isMobile}
           startIcon={<PersonAdd />}
           onClick={() => {
             setEditUser(null);
@@ -236,7 +239,7 @@ export default function UserManagementPage() {
               </InputAdornment>
             ) : null,
           }}
-          sx={{ minWidth: 260 }}
+          sx={{ width: { xs: '100%', sm: 260 } }}
         />
       </Stack>
 
@@ -249,7 +252,7 @@ export default function UserManagementPage() {
       ) : (
         <>
           <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>الاسم الكامل</TableCell>
@@ -320,7 +323,7 @@ export default function UserManagementPage() {
       )}
 
       {/* User Add / Edit Dialog */}
-      <Dialog open={userDialog} onClose={() => { setUserDialog(false); setEditUser(null); }} maxWidth="sm" fullWidth>
+      <Dialog open={userDialog} onClose={() => { setUserDialog(false); setEditUser(null); }} maxWidth="sm" fullWidth fullScreen={isMobile}>
         <DialogTitle sx={{ fontWeight: 700 }}>
           {editUser ? 'تعديل بيانات المستخدم' : 'إضافة كاشير / موظف جديد'}
         </DialogTitle>
@@ -383,7 +386,7 @@ export default function UserManagementPage() {
             </Stack>
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => { setUserDialog(false); setEditUser(null); }}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
@@ -401,6 +404,7 @@ export default function UserManagementPage() {
         onClose={() => setPermissionsUser(null)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogTitle sx={{ fontWeight: 700 }}>
           تخصيص صلاحيات الكاشير والشاشات المسموحة — {permissionsUser?.fullName}
@@ -413,7 +417,9 @@ export default function UserManagementPage() {
           <Tabs
             value={permTab}
             onChange={(_, val) => setPermTab(val)}
-            variant="fullWidth"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
             sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}
           >
             <Tab icon={<ViewSidebar />} iconPosition="start" label="شاشات القائمة الجانبية" />
@@ -496,7 +502,7 @@ export default function UserManagementPage() {
             </FormGroup>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => setPermissionsUser(null)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"

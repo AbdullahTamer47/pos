@@ -4,7 +4,7 @@ import {
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination, TableSortLabel, Paper, Alert, MenuItem, Avatar, alpha, useTheme,
   Collapse, Accordion, AccordionSummary, AccordionDetails, Dialog, DialogTitle,
-  DialogContent, DialogActions,
+  DialogContent, DialogActions, useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon, Close as CloseIcon, Refresh as RefreshIcon,
@@ -59,6 +59,7 @@ const STOCK_STATUS = (current: number, min: number, max: number): 'low' | 'ok' |
 export default function InventoryPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -212,16 +213,16 @@ export default function InventoryPage() {
         </Accordion>
       )}
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems="flex-start">
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
         <TextField
           size="small" placeholder={t('pos.searchProducts')} value={search} onChange={handleSearchChange}
           InputProps={{
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
-        <TextField select size="small" label={t('inventory.warehouse')} value={warehouseFilter} onChange={(e) => { setWarehouseFilter(e.target.value); setPage(0); }} sx={{ minWidth: 180 }}>
+        <TextField select size="small" label={t('inventory.warehouse')} value={warehouseFilter} onChange={(e) => { setWarehouseFilter(e.target.value); setPage(0); }} sx={{ width: { xs: '100%', sm: 180 } }}>
           <MenuItem value="">{t('common.all')}</MenuItem>
           {warehouseList.map((w) => <MenuItem key={w.id} value={w.id}>{w.nameAr || w.nameEn || w.name}</MenuItem>)}
         </TextField>
@@ -236,7 +237,7 @@ export default function InventoryPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 {columns.map((col) => (
@@ -319,10 +320,10 @@ export default function InventoryPage() {
         )}
       </Paper>
 
-      <Dialog open={adjustDialogOpen} onClose={() => setAdjustDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('inventory.adjustStock')}</DialogTitle>
+      <Dialog open={adjustDialogOpen} onClose={() => setAdjustDialogOpen(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('inventory.adjustStock')}</DialogTitle>
         <form onSubmit={adjustForm.handleSubmit((d) => adjustMutation.mutate(d))}>
-          <DialogContent>
+          <DialogContent dividers>
             <Stack spacing={2}>
               <TextField label={t('pos.productName')} fullWidth value={selectedStock?.productName || ''} disabled />
               <TextField label={t('inventory.warehouse')} fullWidth value={selectedStock?.warehouseName || ''} disabled />
@@ -335,17 +336,17 @@ export default function InventoryPage() {
               <TextField label={t('inventory.adjustmentReason')} fullWidth multiline rows={2} {...adjustForm.register('reason')} />
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
             <Button onClick={() => setAdjustDialogOpen(false)}>{t('common.cancel')}</Button>
             <Button type="submit" variant="contained" disabled={adjustMutation.isPending}>{t('common.save')}</Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      <Dialog open={transferDialogOpen} onClose={() => setTransferDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('inventory.transferStock')}</DialogTitle>
+      <Dialog open={transferDialogOpen} onClose={() => setTransferDialogOpen(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('inventory.transferStock')}</DialogTitle>
         <form onSubmit={transferForm.handleSubmit((d) => transferMutation.mutate(d))}>
-          <DialogContent>
+          <DialogContent dividers>
             <Stack spacing={2}>
               <TextField label={t('pos.productName')} fullWidth value={selectedStock?.productName || ''} disabled />
               <TextField label={t('inventory.transferFrom')} fullWidth value={selectedStock?.warehouseName || ''} disabled />
@@ -356,7 +357,7 @@ export default function InventoryPage() {
               <TextField label={t('inventory.adjustmentReason')} fullWidth multiline rows={2} {...transferForm.register('reason')} />
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
             <Button onClick={() => setTransferDialogOpen(false)}>{t('common.cancel')}</Button>
             <Button type="submit" variant="contained" disabled={transferMutation.isPending}>{t('inventory.transferStock')}</Button>
           </DialogActions>

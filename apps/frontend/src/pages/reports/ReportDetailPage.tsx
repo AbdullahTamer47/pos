@@ -335,7 +335,7 @@ export default function ReportDetailPage() {
     const keys = Object.keys(data[0] || {});
     return (
       <TableContainer component={Paper} sx={{ borderRadius: 3, maxHeight: 500 }}>
-        <Table stickyHeader size="small">
+        <Table stickyHeader size="small" sx={{ minWidth: 600 }}>
           <TableHead>
             <TableRow>
               {keys.map((key) => (
@@ -553,12 +553,12 @@ export default function ReportDetailPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" useFlexGap mb={3}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" flexWrap="wrap" useFlexGap gap={2} mb={3}>
         <Typography variant="h4" fontWeight={700}>
           {t(reportTitles[type || ''] || 'reports.report')}
         </Typography>
         {!isFetching && !error && (
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ width: { xs: '100%', sm: 'auto' } }}>
             <Button variant="outlined" startIcon={<PictureAsPdf />} size="small" onClick={() => handleExport('pdf')}>
               PDF
             </Button>
@@ -627,7 +627,7 @@ export default function ReportDetailPage() {
               setPeriod('custom');
             }}
             InputLabelProps={{ shrink: true }}
-            sx={{ minWidth: 160 }}
+            sx={{ width: { xs: '100%', sm: 160 } }}
           />
           <TextField
             label="إلى تاريخ"
@@ -639,7 +639,7 @@ export default function ReportDetailPage() {
               setPeriod('custom');
             }}
             InputLabelProps={{ shrink: true }}
-            sx={{ minWidth: 160 }}
+            sx={{ width: { xs: '100%', sm: 160 } }}
           />
           {branchList.length > 0 && (
             <Autocomplete

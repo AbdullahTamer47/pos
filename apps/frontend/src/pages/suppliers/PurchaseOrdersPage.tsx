@@ -4,6 +4,7 @@ import {
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination, TableSortLabel, Paper, Alert, MenuItem, alpha, useTheme,
   Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, Divider,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon, Add as AddIcon, Close as CloseIcon, Refresh as RefreshIcon,
@@ -59,6 +60,7 @@ function debounce(fn: (value: string) => void, delay: number): (value: string) =
 export default function PurchaseOrdersPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -159,20 +161,20 @@ export default function PurchaseOrdersPage() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={3} gap={2}>
         <Typography variant="h4" fontWeight={700}>{t('nav.purchaseOrders')}</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" onClick={() => navigate('/suppliers')}>{t('nav.suppliers')}</Button>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenPO}>{t('purchaseOrders.addPO')}</Button>
+        <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Button variant="outlined" fullWidth={isMobile} onClick={() => navigate('/suppliers')}>{t('nav.suppliers')}</Button>
+          <Button variant="contained" fullWidth={isMobile} startIcon={<AddIcon />} onClick={handleOpenPO}>{t('purchaseOrders.addPO')}</Button>
         </Stack>
       </Stack>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems="flex-start">
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
         <TextField
           size="small" placeholder={t('common.search')} value={search} onChange={handleSearchChange}
           InputProps={{
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <TextField select size="small" label={t('purchaseOrders.status')} value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }} sx={{ minWidth: 140 }}>
@@ -198,7 +200,7 @@ export default function PurchaseOrdersPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 {columns.map((col) => (
@@ -286,8 +288,8 @@ export default function PurchaseOrdersPage() {
         )}
       </Paper>
 
-      <Dialog open={poDialogOpen} onClose={() => setPoDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{t('purchaseOrders.addPO')}</DialogTitle>
+      <Dialog open={poDialogOpen} onClose={() => setPoDialogOpen(false)} maxWidth="md" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('purchaseOrders.addPO')}</DialogTitle>
         <form onSubmit={poForm.handleSubmit((d) => {
           const payload: CreatePORequest = {
             supplierId: d.supplierId,
@@ -301,9 +303,9 @@ export default function PurchaseOrdersPage() {
           };
           createPOMutation.mutate(payload);
         })}>
-          <DialogContent>
+          <DialogContent dividers>
             <Stack spacing={2.5}>
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField select label={t('purchaseOrders.supplier')} fullWidth required {...poForm.register('supplierId')} error={!!poForm.formState.errors.supplierId} helperText={poForm.formState.errors.supplierId?.message}>
                   {suppliers?.data?.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)}
                 </TextField>
@@ -326,7 +328,18 @@ export default function PurchaseOrdersPage() {
               )}
 
               {fields.map((field, index) => (
-                <Stack key={field.id} direction="row" spacing={1} alignItems="flex-start">
+                <Stack
+                  key={field.id}
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+                  sx={{
+                    p: { xs: 1.5, sm: 0 },
+                    borderRadius: { xs: 2, sm: 0 },
+                    bgcolor: { xs: alpha(theme.palette.action.hover, 0.05), sm: 'transparent' },
+                    border: { xs: `1px solid ${theme.palette.divider}`, sm: 'none' },
+                  }}
+                >
                   <TextField
                     select label={t('pos.productName')} fullWidth
                     {...poForm.register(`items.${index}.productId`)}
@@ -335,26 +348,28 @@ export default function PurchaseOrdersPage() {
                   >
                     {products?.data?.map((p) => <MenuItem key={p.id} value={p.id}>{p.nameAr || p.nameEn || p.name}</MenuItem>)}
                   </TextField>
-                  <TextField
-                    label={t('pos.quantity')} type="number" sx={{ width: 100 }}
-                    {...poForm.register(`items.${index}.quantity`, { valueAsNumber: true })}
-                    error={!!poForm.formState.errors.items?.[index]?.quantity}
-                    helperText={poForm.formState.errors.items?.[index]?.quantity?.message}
-                  />
-                  <TextField
-                    label={t('pos.unitPrice')} type="number" sx={{ width: 120 }}
-                    {...poForm.register(`items.${index}.unitPrice`, { valueAsNumber: true })}
-                    error={!!poForm.formState.errors.items?.[index]?.unitPrice}
-                    helperText={poForm.formState.errors.items?.[index]?.unitPrice?.message}
-                  />
-                  <IconButton color="error" onClick={() => remove(index)} disabled={fields.length === 1} sx={{ mt: 0.5 }}>
-                    <CloseIcon />
-                  </IconButton>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <TextField
+                      label={t('pos.quantity')} type="number" sx={{ width: { xs: '50%', sm: 100 } }}
+                      {...poForm.register(`items.${index}.quantity`, { valueAsNumber: true })}
+                      error={!!poForm.formState.errors.items?.[index]?.quantity}
+                      helperText={poForm.formState.errors.items?.[index]?.quantity?.message}
+                    />
+                    <TextField
+                      label={t('pos.unitPrice')} type="number" sx={{ width: { xs: '50%', sm: 120 } }}
+                      {...poForm.register(`items.${index}.unitPrice`, { valueAsNumber: true })}
+                      error={!!poForm.formState.errors.items?.[index]?.unitPrice}
+                      helperText={poForm.formState.errors.items?.[index]?.unitPrice?.message}
+                    />
+                    <IconButton color="error" onClick={() => remove(index)} disabled={fields.length === 1} sx={{ mt: { xs: 0, sm: 0.5 } }}>
+                      <CloseIcon />
+                    </IconButton>
+                  </Stack>
                 </Stack>
               ))}
 
               <Divider />
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField label={t('purchaseOrders.discount')} fullWidth type="number" {...poForm.register('discount', { valueAsNumber: true })} />
                 <TextField label={t('purchaseOrders.shipping')} fullWidth type="number" {...poForm.register('shipping', { valueAsNumber: true })} />
               </Stack>
@@ -369,7 +384,7 @@ export default function PurchaseOrdersPage() {
               </Paper>
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
             <Button onClick={() => setPoDialogOpen(false)}>{t('common.cancel')}</Button>
             <Button type="submit" variant="contained" disabled={createPOMutation.isPending}>
               {createPOMutation.isPending ? t('common.processing') : t('common.create')}
