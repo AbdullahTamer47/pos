@@ -15,6 +15,7 @@ import {
   styled,
   alpha,
   useTheme,
+  useMediaQuery,
   Alert,
 } from '@mui/material';
 import {
@@ -68,6 +69,7 @@ export function QuotationModal({
 }: QuotationModalProps) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
 
   const [customerName, setCustomerName] = useState(customer?.name || '');
@@ -154,10 +156,15 @@ export function QuotationModal({
     <Dialog
       open={open}
       onClose={onClose}
+      fullScreen={isMobile}
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 4, overflow: 'hidden' },
+        sx: {
+          borderRadius: isMobile ? 0 : 4,
+          overflow: 'hidden',
+          m: isMobile ? 0 : 2,
+        },
       }}
     >
       <DialogTitle
@@ -181,7 +188,7 @@ export function QuotationModal({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 3 }}>
+      <DialogContent sx={{ py: 3, px: { xs: 2, sm: 3 } }}>
         <Stack spacing={2.5}>
           {error && <Alert severity="error">{error}</Alert>}
 
@@ -189,7 +196,7 @@ export function QuotationModal({
             يتم تسجيل استفسار العميل وحفظ الأصناف والأسعار في النظام للرجوع إليها في أي وقت وتحويلها إلى فاتورة بيع مباشرة عند عودة العميل.
           </Alert>
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
             <TextField
               label="اسم العميل المستفسر *"
               value={customerName}
@@ -216,7 +223,7 @@ export function QuotationModal({
             />
           </Box>
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
             <TextField
               label="مدة صلاحية العرض (أيام)"
               type="number"
@@ -281,13 +288,26 @@ export function QuotationModal({
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2, borderTop: `1px solid ${theme.palette.divider}`, gap: 1 }}>
-        <Button onClick={onClose} variant="outlined" color="inherit">
+      <DialogActions
+        sx={{
+          px: { xs: 2, sm: 3 },
+          py: 2,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          gap: 1,
+          position: isMobile ? 'sticky' : 'relative',
+          bottom: 0,
+          zIndex: 10,
+          bgcolor: 'background.paper',
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+        }}
+      >
+        <Button onClick={onClose} fullWidth={isMobile} variant="outlined" color="inherit">
           إلغاء
         </Button>
         <Button
           variant="outlined"
           color="primary"
+          fullWidth={isMobile}
           startIcon={<SaveIcon />}
           onClick={() => handleSave(false)}
           disabled={createQuotationMutation.isPending || !customerName.trim()}
@@ -297,10 +317,11 @@ export function QuotationModal({
         <Button
           variant="contained"
           color="primary"
+          fullWidth={isMobile}
           startIcon={<PrintIcon />}
           onClick={() => handleSave(true)}
           disabled={createQuotationMutation.isPending || !customerName.trim()}
-          sx={{ fontWeight: 700, px: 3 }}
+          sx={{ fontWeight: 700, px: 3, minHeight: 42 }}
         >
           حفظ وطباعة عرض السعر
         </Button>

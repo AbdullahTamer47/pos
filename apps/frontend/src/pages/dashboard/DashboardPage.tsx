@@ -427,16 +427,22 @@ export default function DashboardPage() {
               mb: 3,
               borderRadius: 3,
               py: 1.5,
-              px: 2.5,
+              px: { xs: 1.5, sm: 2.5 },
               background: subInfo.daysRemaining <= 5
                 ? 'linear-gradient(135deg, #b71c1c 0%, #e53935 100%)'
                 : 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)',
               color: '#ffffff',
               boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)',
-              alignItems: 'center',
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              flexDirection: { xs: 'column', sm: 'row' },
+              '& .MuiAlert-action': {
+                pt: { xs: 1.5, sm: 0 },
+                pl: { xs: 0, sm: 1 },
+                alignSelf: { xs: 'stretch', sm: 'center' },
+              },
             }}
             action={
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
                 <Button
                   variant="contained"
                   size="small"
@@ -455,6 +461,7 @@ export default function DashboardPage() {
                     boxShadow: 'none',
                     '&:hover': { bgcolor: '#1EBE5D' },
                     whiteSpace: 'nowrap',
+                    width: { xs: '100%', sm: 'auto' },
                   }}
                 >
                   تجديد الاشتراك الآن (01000165672)

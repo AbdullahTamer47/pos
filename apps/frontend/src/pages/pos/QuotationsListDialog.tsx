@@ -18,6 +18,7 @@ import {
   styled,
   alpha,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -64,6 +65,7 @@ export function QuotationsListDialog({
   onOpenPaymentModal,
 }: QuotationsListDialogProps) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const { clearCart, addToCart, setCustomer } = usePOSStore();
   const [searchQuery, setSearchQuery] = useState('');
@@ -159,7 +161,20 @@ export function QuotationsListDialog({
   );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4, maxHeight: '85vh' } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen={isMobile}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: isMobile ? 0 : 4,
+          maxHeight: isMobile ? '100%' : '85vh',
+          m: isMobile ? 0 : 2,
+        },
+      }}
+    >
       <DialogTitle
         sx={{
           display: 'flex',
@@ -292,13 +307,22 @@ export function QuotationsListDialog({
 
                   <Divider sx={{ my: 1.5 }} />
 
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      gap: 1,
+                      flexDirection: { xs: 'column-reverse', sm: 'row' },
+                    }}
+                  >
                     <Button
                       size="small"
                       variant="outlined"
                       color="inherit"
+                      fullWidth={isMobile}
                       startIcon={<PrintIcon />}
                       onClick={() => onPrintQuotation(quote)}
+                      sx={{ minHeight: 38, borderRadius: 2 }}
                     >
                       معاينة وطباعة
                     </Button>
@@ -306,9 +330,10 @@ export function QuotationsListDialog({
                       size="small"
                       variant="contained"
                       color="primary"
+                      fullWidth={isMobile}
                       startIcon={<ConvertIcon />}
                       onClick={() => handleConvertToSale(quote)}
-                      sx={{ fontWeight: 700 }}
+                      sx={{ fontWeight: 700, minHeight: 38, borderRadius: 2 }}
                     >
                       تحويل إلى فاتورة بيع (تحميل للسلة)
                     </Button>
@@ -320,8 +345,17 @@ export function QuotationsListDialog({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-        <Button onClick={onClose} variant="outlined">
+      <DialogActions
+        sx={{
+          p: 2,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          position: isMobile ? 'sticky' : 'relative',
+          bottom: 0,
+          zIndex: 10,
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Button onClick={onClose} fullWidth={isMobile} variant="outlined" sx={{ minHeight: 44, borderRadius: 2 }}>
           إغلاق
         </Button>
       </DialogActions>

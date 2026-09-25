@@ -181,7 +181,7 @@ export default function ProductsPage() {
         <Typography variant="h4" fontWeight={700}>
           {t('nav.products')}
         </Typography>
-        <Stack direction="row" spacing={1}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
           <Button
             variant="outlined"
             startIcon={<BarcodeIcon />}
@@ -189,6 +189,7 @@ export default function ProductsPage() {
               setBarcodeProduct(null);
               setBarcodeModalOpen(true);
             }}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             طباعة الباركود
           </Button>
@@ -196,6 +197,7 @@ export default function ProductsPage() {
             variant="outlined"
             startIcon={<UploadIcon />}
             onClick={() => navigate('/products/import')}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             {t('products.bulkImport')}
           </Button>
@@ -203,6 +205,7 @@ export default function ProductsPage() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => navigate('/products/new')}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             {t('products.addProduct')}
           </Button>
@@ -229,7 +232,7 @@ export default function ProductsPage() {
               </InputAdornment>
             ) : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ minWidth: { xs: '100%', sm: 280 }, width: { xs: '100%', sm: 280 } }}
         />
 
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>

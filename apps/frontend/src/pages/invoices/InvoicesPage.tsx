@@ -107,7 +107,7 @@ export default function InvoicesPage() {
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ minWidth: { xs: '100%', sm: 280 }, width: { xs: '100%', sm: 280 } }}
         />
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <TextField select size="small" label={t('common.type')} value={typeFilter || ''} onChange={(e) => { setTypeFilter(e.target.value || null); setPage(0); }} sx={{ minWidth: 120 }}>

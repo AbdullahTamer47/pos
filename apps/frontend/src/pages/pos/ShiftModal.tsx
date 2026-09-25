@@ -17,6 +17,8 @@ import {
   Alert,
   InputAdornment,
   CircularProgress,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -37,6 +39,8 @@ interface ShiftModalProps {
 }
 
 export function ShiftModal({ open, onClose }: ShiftModalProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<'status' | 'open' | 'close' | 'expense'>('status');
 
@@ -127,7 +131,20 @@ export function ShiftModal({ open, onClose }: ShiftModalProps) {
   const summary = currentShift?.summary;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen={isMobile}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: isMobile ? 0 : 4,
+          maxHeight: isMobile ? '100%' : '90vh',
+          m: isMobile ? 0 : 2,
+        },
+      }}
+    >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ShiftIcon color="primary" />
@@ -415,8 +432,17 @@ export function ShiftModal({ open, onClose }: ShiftModalProps) {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} sx={{ borderRadius: 2 }}>
+      <DialogActions
+        sx={{
+          p: 2,
+          position: isMobile ? 'sticky' : 'relative',
+          bottom: 0,
+          zIndex: 10,
+          bgcolor: 'background.paper',
+          borderTop: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Button onClick={onClose} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>
           إغلاق
         </Button>
       </DialogActions>

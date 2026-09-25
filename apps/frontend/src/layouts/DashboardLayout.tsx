@@ -14,6 +14,9 @@ import {
   useMediaQuery,
   alpha,
   IconButton,
+  BottomNavigation,
+  BottomNavigationAction,
+  Paper,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -431,7 +434,7 @@ export default function DashboardLayout() {
             flex: 1,
             minHeight: 0,
             p: location.pathname === '/pos' ? 0 : { xs: 2, sm: 3 },
-            pb: location.pathname === '/pos' ? 0 : { xs: 5, sm: 6 },
+            pb: location.pathname === '/pos' ? 0 : { xs: 8.5, sm: 6 },
             overflowY: location.pathname === '/pos' ? 'hidden' : 'auto',
             overflowX: 'hidden',
             display: 'flex',
@@ -454,6 +457,110 @@ export default function DashboardLayout() {
             </RouteErrorBoundary>
           </motion.div>
         </Box>
+
+        {/* Mobile App Bottom Navigation Bar for rapid one-thumb switching outside POS */}
+        {isMobile && location.pathname !== '/pos' && (
+          <Paper
+            elevation={8}
+            sx={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: theme.zIndex.appBar,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              bgcolor: isDark ? 'rgba(29,27,32,0.92)' : 'rgba(255,255,255,0.94)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+            }}
+          >
+            <BottomNavigation
+              showLabels
+              value={
+                location.pathname === '/pos'
+                  ? '/pos'
+                  : location.pathname.startsWith('/invoices')
+                  ? '/invoices'
+                  : location.pathname === '/' || location.pathname === '/dashboard'
+                  ? '/'
+                  : location.pathname.startsWith('/products')
+                  ? '/products'
+                  : 'more'
+              }
+              onChange={(_, newValue) => {
+                if (newValue === 'more') {
+                  setMobileOpen(true);
+                } else {
+                  handleNavigate(newValue);
+                }
+              }}
+              sx={{
+                bgcolor: 'transparent',
+                height: 60,
+                '& .MuiBottomNavigationAction-root': {
+                  minWidth: 0,
+                  p: '6px 0',
+                  color: theme.palette.text.secondary,
+                  '&.Mui-selected': {
+                    color: theme.palette.primary.main,
+                    fontWeight: 700,
+                  },
+                },
+                '& .MuiBottomNavigationAction-label': {
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  mt: 0.25,
+                  '&.Mui-selected': {
+                    fontSize: '0.74rem',
+                    fontWeight: 800,
+                  },
+                },
+              }}
+            >
+              <BottomNavigationAction
+                label="الرئيسية"
+                value="/"
+                icon={<DashboardIcon sx={{ fontSize: 22 }} />}
+              />
+              <BottomNavigationAction
+                label="الفواتير"
+                value="/invoices"
+                icon={<InvoicesIcon sx={{ fontSize: 22 }} />}
+              />
+              <BottomNavigationAction
+                label="نقطة البيع"
+                value="/pos"
+                icon={
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      bgcolor: theme.palette.primary.main,
+                      color: '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(103,80,164,0.4)',
+                    }}
+                  >
+                    <POSIcon sx={{ fontSize: 18 }} />
+                  </Box>
+                }
+              />
+              <BottomNavigationAction
+                label="المنتجات"
+                value="/products"
+                icon={<ProductsIcon sx={{ fontSize: 22 }} />}
+              />
+              <BottomNavigationAction
+                label="المزيد"
+                value="more"
+                icon={<MenuIcon sx={{ fontSize: 22 }} />}
+              />
+            </BottomNavigation>
+          </Paper>
+        )}
       </Box>
     </Box>
   );

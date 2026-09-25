@@ -14,6 +14,7 @@ import {
   styled,
   alpha,
   useTheme,
+  useMediaQuery,
   CircularProgress,
   Divider,
 } from '@mui/material';
@@ -95,6 +96,7 @@ interface HeldInvoicesDialogProps {
 export function HeldInvoicesDialog({ open, onClose }: HeldInvoicesDialogProps) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const {
     clearCart,
@@ -245,12 +247,14 @@ export function HeldInvoicesDialog({ open, onClose }: HeldInvoicesDialogProps) {
     <Dialog
       open={open}
       onClose={onClose}
+      fullScreen={isMobile}
       maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 4,
-          maxHeight: '85vh',
+          borderRadius: isMobile ? 0 : 4,
+          maxHeight: isMobile ? '100%' : '85vh',
+          m: isMobile ? 0 : 2,
         },
       }}
     >
@@ -269,7 +273,7 @@ export function HeldInvoicesDialog({ open, onClose }: HeldInvoicesDialogProps) {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2.5 } }}>
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
             <CircularProgress />
@@ -341,30 +345,32 @@ export function HeldInvoicesDialog({ open, onClose }: HeldInvoicesDialogProps) {
 
                 <Divider sx={{ my: 1 }} />
 
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
                   <Button
                     size="small"
                     color="error"
+                    fullWidth={isMobile}
                     startIcon={deletingId === invoice.id ? <CircularProgress size={16} /> : <DeleteIcon />}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(invoice.id);
                     }}
                     disabled={deletingId === invoice.id}
-                    sx={{ minHeight: 36, borderRadius: 10 }}
+                    sx={{ minHeight: 38, borderRadius: 2 }}
                   >
                     {t('common.delete')}
                   </Button>
                   <Button
                     size="small"
                     variant="contained"
+                    fullWidth={isMobile}
                     startIcon={resumingId === invoice.id ? <CircularProgress size={16} color="inherit" /> : <ResumeIcon />}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleResume(invoice.id);
                     }}
                     disabled={resumingId === invoice.id}
-                    sx={{ minHeight: 36, borderRadius: 10 }}
+                    sx={{ minHeight: 38, borderRadius: 2, fontWeight: 700 }}
                   >
                     {t('pos.resume')}
                   </Button>
@@ -375,8 +381,17 @@ export function HeldInvoicesDialog({ open, onClose }: HeldInvoicesDialogProps) {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} sx={{ minHeight: 44, borderRadius: 12 }}>
+      <DialogActions
+        sx={{
+          p: 2,
+          position: isMobile ? 'sticky' : 'relative',
+          bottom: 0,
+          zIndex: 10,
+          bgcolor: 'background.paper',
+          borderTop: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Button onClick={onClose} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>
           {t('common.close')}
         </Button>
       </DialogActions>
