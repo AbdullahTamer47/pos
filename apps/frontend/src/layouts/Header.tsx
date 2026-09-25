@@ -35,9 +35,11 @@ import {
   AdminPanelSettings,
   WorkspacePremium,
   WhatsApp as WhatsAppIcon,
+  CloudSync as CloudSyncIcon,
 } from '@mui/icons-material';
 import { useAuthStore } from '@/stores/authStore';
 import { UserRole } from '@smartpos/types';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { useThemeContext } from '@/theme/ThemeProvider';
 import { useAppStore } from '@/stores/appStore';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -54,7 +56,6 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const { mode, toggleMode } = useThemeContext();
-  const { isOffline } = useAppStore();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [notifAnchor, setNotifAnchor] = useState<HTMLElement | null>(null);
@@ -76,6 +77,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
   });
 
   const isDark = mode === 'dark';
+  const { isOffline, pendingCount, syncInProgress, syncNow } = useOfflineSync();
 
   const handleLogout = useCallback(() => {
     setAnchorEl(null);
@@ -147,6 +149,31 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+          {pendingCount > 0 && (
+            <Tooltip title={isOffline ? 'فواتير بانتظار عودة الاتصال للمزامنة' : 'مزامنة الفواتير المسجلة أوفلاين مع السيرفر الآن'}>
+              <Button
+                size="small"
+                variant="outlined"
+                color="warning"
+                onClick={() => syncNow()}
+                disabled={syncInProgress}
+                startIcon={<CloudSyncIcon sx={{ animation: syncInProgress ? 'spin 1s linear infinite' : 'none' }} />}
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: 700,
+                  fontSize: { xs: '0.72rem', sm: '0.8rem' },
+                  px: { xs: 1, sm: 1.5 },
+                  height: 34,
+                  bgcolor: alpha(theme.palette.warning.main, 0.08),
+                  borderColor: alpha(theme.palette.warning.main, 0.4),
+                  '&:hover': { bgcolor: alpha(theme.palette.warning.main, 0.16) },
+                }}
+              >
+                {pendingCount} {isMobile ? '' : 'أوفلاين'}
+              </Button>
+            </Tooltip>
+          )}
 
           <Tooltip title={isDark ? t('common.lightMode', 'الوضع النهاري') : t('common.darkMode', 'الوضع الليلي')}>
             <IconButton

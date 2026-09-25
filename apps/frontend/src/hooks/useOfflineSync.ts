@@ -64,11 +64,17 @@ export function useOfflineSync() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    const handleInvoicesUpdated = () => {
+      updatePendingCount();
+    };
+    window.addEventListener('smartpos-offline-invoices-updated', handleInvoicesUpdated);
+
     updatePendingCount();
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('smartpos-offline-invoices-updated', handleInvoicesUpdated);
     };
   }, [updatePendingCount]);
 
@@ -113,6 +119,13 @@ export function useOfflineSync() {
     setSyncInProgress(true);
 
     try {
+      try {
+        const { offlineService } = await import('@/services/offlineService');
+        await offlineService.syncPendingInvoices();
+      } catch (err) {
+        console.warn('Failed to sync offline invoices:', err);
+      }
+
       const db = await getDb();
       const ops = await db.getAll(STORE_NAME);
       const sortedOps = ops.sort((a, b) => a.timestamp - b.timestamp);

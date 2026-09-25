@@ -51,6 +51,44 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   giftCard: 'بطاقة هدايا (Gift Card)',
 };
 
+export function generateBarcodeSvg(code: string, height: number = 40): string {
+  const cleanCode = (code || '000000').toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  const patterns: Record<string, string> = {
+    '0': 'bwbwbwBwb', '1': 'BwbwbwbwB', '2': 'bwBwbwbwB', '3': 'BwBwbwbwb',
+    '4': 'bwbwBwbwB', '5': 'BwbwBwbwb', '6': 'bwBwBwbwb', '7': 'bwbwbwBwB',
+    '8': 'BwbwbwBwb', '9': 'bwBwbwBwb', 'A': 'BwbwbwbWb', 'B': 'bwBwbwbWb',
+    'C': 'BwBwbwbwb', 'D': 'bwbwBwbWb', 'E': 'BwbwBwbwb', 'F': 'bwBwBwbwb',
+    'G': 'bwbwbwBWb', 'H': 'BwbwbwBwb', 'I': 'bwBwbwBwb', 'J': 'bwbwBwBwb',
+    'K': 'BwbwbwbwB', 'L': 'bwBwbwbwB', 'M': 'BwBwbwbwb', 'N': 'bwbwBwbwB',
+    'O': 'BwbwBwbwb', 'P': 'bwBwBwbwb', 'Q': 'bwbwbwBwB', 'R': 'BwbwbwBwb',
+    'S': 'bwBwbwBwb', 'T': 'bwbwBwBwb', 'U': 'BWbwbwbwb', 'V': 'bWBwbwbwb',
+    'W': 'BWBwbwbwb', 'X': 'bWbwBwbwb', 'Y': 'BWbwBwbwb', 'Z': 'bWBwBwbwb',
+    '-': 'bWbwbwBwb', '*': 'bWbwBwBwb',
+  };
+  const full = `*${cleanCode}*`;
+  let x = 8;
+  const rects: string[] = [];
+  for (const char of full) {
+    const pat: string = patterns[char] || patterns['-'] || 'bWbwbwBwb';
+    for (let i = 0; i < pat.length; i++) {
+      const charCode = pat[i] || 'b';
+      const isBar = i % 2 === 0;
+      const isWide = charCode === charCode.toUpperCase() && charCode !== 'b';
+      const w = isWide ? 2.6 : 1.1;
+      if (isBar) {
+        rects.push(`<rect x="${x.toFixed(1)}" y="0" width="${w.toFixed(1)}" height="${height}" fill="#0f172a" />`);
+      }
+      x += w + 0.7;
+    }
+    x += 1.8;
+  }
+  const totalWidth = Math.ceil(x + 8);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalWidth} ${height + 14}" style="max-width: 100%; height: ${height + 14}px; display: inline-block;">
+    ${rects.join('')}
+    <text x="${(totalWidth / 2).toFixed(1)}" y="${height + 12}" text-anchor="middle" font-size="10.5" font-family="monospace" font-weight="700" fill="#0f172a">${cleanCode}</text>
+  </svg>`;
+}
+
 export function renderPrintHtml(html: string, windowWidth: number = 800, windowHeight: number = 750) {
   let printWindow: Window | null = null;
   try {
@@ -161,11 +199,8 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
     })
     .join('');
 
-  // QR Code payload (compliant with simplified electronic invoices)
-  const qrData = encodeURIComponent(
-    `فاتورة:${data.invoiceNumber}|متجر:${data.storeName || 'Smart POS'}|ضريبة:${(data.taxNumber || '300123456')}|إجمالي:${grandTotalVal.toFixed(2)}|ضريبة_المبلغ:${taxVal.toFixed(2)}|تاريخ:${formattedDate}`
-  );
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=1&data=${qrData}`;
+  // Offline SVG Barcode for fast handheld scanning & returns
+  const barcodeSvg = generateBarcodeSvg(data.invoiceNumber, is58 ? 34 : 40);
 
   const html = `
     <!DOCTYPE html>
@@ -529,10 +564,10 @@ export function printThermalReceipt(data: ThermalReceiptProps) {
           </div>` : ''}
         </div>
 
-        <!-- QR Code -->
-        <div class="qr-box">
-          <img src="${qrCodeUrl}" alt="ZATCA / ETA QR Code" />
-          <div style="font-size: 9px; color: #64748b; margin-top: 2px;">امسح للتحقق من صحة الفاتورة</div>
+        <!-- Invoice Barcode (Offline & Scanner-Ready) -->
+        <div style="text-align: center; margin: 12px 0 6px;">
+          ${barcodeSvg}
+          <div style="font-size: 8.5px; color: #64748b; margin-top: 2px;">امسح الباركود للاسترجاع والاستبدال السريع</div>
         </div>
 
         <!-- Footer -->
@@ -649,10 +684,7 @@ export function printA4Invoice(data: ThermalReceiptProps) {
     })
     .join('');
 
-  const qrData = encodeURIComponent(
-    `فاتورة_ضريبية:${data.invoiceNumber}|بائع:${data.storeName || 'Smart POS'}|رقم_ضريبي:${data.taxNumber || '300123456'}|تاريخ:${formattedDate}|إجمالي:${grandTotalVal.toFixed(2)}|ضريبة:${taxVal.toFixed(2)}`
-  );
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=125x125&margin=2&data=${qrData}`;
+  const a4BarcodeSvg = generateBarcodeSvg(data.invoiceNumber, 42);
 
   const html = `
     <!DOCTYPE html>
@@ -1129,22 +1161,22 @@ export function printA4Invoice(data: ThermalReceiptProps) {
           <!-- Terms & Signatures -->
           <div>
             <div class="terms-box">
-              <div class="terms-title">📌 الشروط والأحكام والسياسات القانونية:</div>
+              <div class="terms-title">📌 الشروط والأحكام والسياسات:</div>
               <div class="terms-text">
-                1. الفاتورة صادرة طبقاً لمنظومة الفاتورة والإيصال الإلكتروني المعتمدة وتعتبر سنداً قانونياً للملكية.<br/>
+                1. تعتبر هذه الفاتورة سنداً رسمياً لإثبات عملية الشراء وسداد القيمة.<br/>
                 2. يحق للعميل استبدال أو استرجاع البضاعة خلال 14 يوماً من تاريخ الفاتورة مع إحضار أصل الفاتورة وأن تكون البضاعة بحالتها الأصلية.<br/>
-                3. الأصناف الخاضعة للضريبة محسوبة وفقاً للنسب المقررة قانوناً (14% ضريبة القيمة المضافة العامة).
+                3. تخضع كافة العمليات للشروط والسياسات المعتمدة لدى المتجر.
               </div>
             </div>
 
             <!-- Signatures -->
             <div class="signatures">
               <div class="sig-box">
-                <div>توقيع واستلام المشتري</div>
+                <div>توقيع واستلام العميل</div>
                 <div style="margin-top: 22px; border-bottom: 1px dotted #94a3b8; width: 110px; margin-left: auto; margin-right: auto;"></div>
               </div>
               <div class="sig-box">
-                <div>اعتماد وختم الشركة الرسمي</div>
+                <div>اعتماد وختم المتجر</div>
                 <div style="margin-top: 22px; border-bottom: 1px dotted #94a3b8; width: 110px; margin-left: auto; margin-right: auto;"></div>
               </div>
             </div>
@@ -1195,13 +1227,10 @@ export function printA4Invoice(data: ThermalReceiptProps) {
               </tr>` : ''}
             </table>
 
-            <!-- QR Code Section -->
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;">
-              <img src="${qrCodeUrl}" alt="QR" style="width: 58px; height: 58px; border-radius: 4px;" />
-              <div>
-                <div style="font-weight: 800; font-size: 11px; color: #0f172a;">الفاتورة الإلكترونية المعتمدة</div>
-                <div style="font-size: 9.5px; color: #64748b; line-height: 1.3;">رمز التحقق الرقمي المعتمد لدى منظومة الفاتورة الضريبية</div>
-              </div>
+            <!-- Barcode Section (100% Offline SVG) -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px;">
+              ${a4BarcodeSvg}
+              <div style="font-weight: 700; font-size: 10px; color: #475569; letter-spacing: 0.5px;">باركود الفاتورة للتعرف السريع بالماسح الضوئي</div>
             </div>
 
           </div>
@@ -1211,7 +1240,7 @@ export function printA4Invoice(data: ThermalReceiptProps) {
         <!-- Stamp & Watermark Footer -->
         <div class="footer-stamp">
           <div>تم الإصدار بواسطة نظام نقاط البيع Smart POS v2.0 • جميع الحقوق محفوظة</div>
-          <div style="direction: ltr; font-family: monospace; font-weight: 700;">INV-ETA-${data.invoiceNumber}-VERIFIED</div>
+          <div style="direction: ltr; font-family: monospace; font-weight: 700;">INV-${data.invoiceNumber}</div>
         </div>
 
       </div>

@@ -51,6 +51,7 @@ export const offlineService = {
     pendingList.push(offlineItem);
     try {
       localStorage.setItem(OFFLINE_INVOICES_KEY, JSON.stringify(pendingList));
+      window.dispatchEvent(new Event('smartpos-offline-invoices-updated'));
     } catch {
       // Storage full
     }
@@ -61,6 +62,7 @@ export const offlineService = {
     const pendingList = this.getPendingInvoices().filter((item) => item.id !== id);
     try {
       localStorage.setItem(OFFLINE_INVOICES_KEY, JSON.stringify(pendingList));
+      window.dispatchEvent(new Event('smartpos-offline-invoices-updated'));
     } catch {
       //
     }
@@ -83,6 +85,7 @@ export const offlineService = {
     }
 
     if (syncedCount > 0) {
+      window.dispatchEvent(new Event('smartpos-offline-invoices-updated'));
       toast.success(`⚡ تم بنجاح مزامنة ${syncedCount} فاتورة مسجلة أوفلاين مع السيرفر!`);
     }
 
