@@ -22,6 +22,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Backup as BackupIcon,
@@ -39,6 +41,8 @@ import api from '@/api/endpoints';
 import { mockDb } from '@/api/mockDb';
 
 export default function BackupSettingsPage() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -121,11 +125,12 @@ export default function BackupSettingsPage() {
             حماية وأرشفة بيانات المبيعات، المخزون، والعملاء
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
             onClick={() => refetch()}
+            fullWidth={isMobile}
           >
             تحديث
           </Button>
@@ -136,6 +141,7 @@ export default function BackupSettingsPage() {
             color="secondary"
             startIcon={<UploadIcon />}
             sx={{ fontWeight: 700 }}
+            fullWidth={isMobile}
           >
             استعادة من ملف JSON
             <input type="file" accept=".json" hidden onChange={handleRestoreFile} />
@@ -148,6 +154,7 @@ export default function BackupSettingsPage() {
             disabled={createBackupMutation.isPending}
             onClick={() => createBackupMutation.mutate()}
             sx={{ fontWeight: 700 }}
+            fullWidth={isMobile}
           >
             إنشاء وتحميل نسخة فورية 💾
           </Button>
@@ -161,7 +168,7 @@ export default function BackupSettingsPage() {
       <Card sx={{ borderRadius: 3 }}>
         <CardContent sx={{ p: 0 }}>
           <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 'none' }}>
-            <Table>
+            <Table sx={{ minWidth: 620 }}>
               <TableHead sx={{ backgroundColor: 'action.hover' }}>
                 <TableRow>
                   <TableCell align="right" sx={{ fontWeight: 700 }}>اسم النسخة الاحتياطية</TableCell>

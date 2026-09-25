@@ -386,12 +386,14 @@ export default function UserManagementPage() {
             </Stack>
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-          <Button onClick={() => { setUserDialog(false); setEditUser(null); }}>{t('common.cancel')}</Button>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+          <Button onClick={() => { setUserDialog(false); setEditUser(null); }} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleSubmit((d) => (editUser ? updateMut.mutate({ id: editUser.id, data: d }) : createMut.mutate(d)))}
             disabled={createMut.isPending || updateMut.isPending}
+            fullWidth={isMobile}
+            sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}
           >
             {t('common.save')}
           </Button>
@@ -502,14 +504,16 @@ export default function UserManagementPage() {
             </FormGroup>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-          <Button onClick={() => setPermissionsUser(null)}>{t('common.cancel')}</Button>
+        <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+          <Button onClick={() => setPermissionsUser(null)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={() =>
               updatePermsMut.mutate({ id: permissionsUser!.id, permissions: permValues })
             }
             disabled={updatePermsMut.isPending}
+            fullWidth={isMobile}
+            sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}
           >
             حفظ الصلاحيات
           </Button>

@@ -122,7 +122,7 @@ function CategoryNode({ category, level, onEdit, onDelete, onToggleActive }: Cat
           size="small"
           label={`${category.productCount || 0} ${t('categories.productCount')}`}
           variant="outlined"
-          sx={{ minWidth: 80, justifyContent: 'center' }}
+          sx={{ minWidth: 80, justifyContent: 'center', display: { xs: 'none', sm: 'inline-flex' } }}
         />
 
         <Tooltip title={category.isActive ? t('common.deactivate') : t('common.activate')}>
@@ -374,6 +374,7 @@ export default function CategoriesPage() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleOpenAdd}
+            sx={{ flexGrow: { xs: 1, sm: 0 } }}
           >
             {t('categories.addCategory')}
           </Button>

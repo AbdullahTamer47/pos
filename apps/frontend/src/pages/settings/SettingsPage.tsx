@@ -12,6 +12,7 @@ import {
   ArrowForward as ArrowIcon,
   Phone as PhoneIcon,
   Verified as VerifiedIcon,
+  Backup as BackupIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,13 @@ export default function SettingsPage() {
       desc: 'إضافة وإدارة حسابات الكاشير والمشرفين والصلاحيات',
       icon: <UsersIcon />,
       color: '#d32f2f',
+    },
+    {
+      path: '/settings/backup',
+      title: 'النسخ الاحتياطي والأرشفة',
+      desc: 'إنشاء واستعادة النسخ الاحتياطية وتصدير وحماية بيانات المتجر',
+      icon: <BackupIcon />,
+      color: '#0288d1',
     },
   ];
 

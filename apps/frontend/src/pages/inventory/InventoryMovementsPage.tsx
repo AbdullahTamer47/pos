@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import {
   Box, TextField, InputAdornment, Button, Chip, Typography, IconButton,
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  TablePagination, TableSortLabel, Paper, Alert, MenuItem, alpha, useTheme,
+  TablePagination, TableSortLabel, Paper, Alert, MenuItem, alpha, useTheme, useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon, Close as CloseIcon, Refresh as RefreshIcon,
@@ -32,6 +32,7 @@ function debounce(fn: (value: string) => void, delay: number): (value: string) =
 export default function InventoryMovementsPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
@@ -105,22 +106,22 @@ export default function InventoryMovementsPage() {
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          <TextField select size="small" label={t('inventory.movementType')} value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }} sx={{ minWidth: 140 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap" useFlexGap sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <TextField select size="small" label={t('inventory.movementType')} value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }} sx={{ width: { xs: '100%', sm: 140 } }}>
             <MenuItem value="">{t('common.all')}</MenuItem>
             {MOVEMENT_TYPES.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
           </TextField>
-          <TextField select size="small" label={t('inventory.warehouse')} value={warehouseFilter} onChange={(e) => { setWarehouseFilter(e.target.value); setPage(0); }} sx={{ minWidth: 180 }}>
+          <TextField select size="small" label={t('inventory.warehouse')} value={warehouseFilter} onChange={(e) => { setWarehouseFilter(e.target.value); setPage(0); }} sx={{ width: { xs: '100%', sm: 180 } }}>
             <MenuItem value="">{t('common.all')}</MenuItem>
             {warehouses?.data?.map((w) => <MenuItem key={w.id} value={w.id}>{w.nameAr || w.nameEn || w.name}</MenuItem>)}
           </TextField>
-          <TextField size="small" type="date" label={t('common.from')} value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(0); }} InputLabelProps={{ shrink: true }} sx={{ minWidth: 150 }} />
-          <TextField size="small" type="date" label={t('common.to')} value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(0); }} InputLabelProps={{ shrink: true }} sx={{ minWidth: 150 }} />
+          <TextField size="small" type="date" label={t('common.from')} value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(0); }} InputLabelProps={{ shrink: true }} sx={{ width: { xs: '100%', sm: 150 } }} />
+          <TextField size="small" type="date" label={t('common.to')} value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(0); }} InputLabelProps={{ shrink: true }} sx={{ width: { xs: '100%', sm: 150 } }} />
           {hasFilters && <Chip label={t('common.clearFilters')} onDelete={clearFilters} variant="outlined" color="error" deleteIcon={<CloseIcon />} />}
         </Stack>
-        <Button variant="outlined" startIcon={<DownloadIcon />} onClick={exportToCSV} sx={{ ml: { sm: 'auto' } }}>{t('common.export')}</Button>
+        <Button variant="outlined" startIcon={<DownloadIcon />} onClick={exportToCSV} sx={{ ml: { sm: 'auto' }, width: { xs: '100%', sm: 'auto' } }}>{t('common.export')}</Button>
       </Stack>
 
       {isError && (
@@ -131,7 +132,7 @@ export default function InventoryMovementsPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 {columns.map((col) => (

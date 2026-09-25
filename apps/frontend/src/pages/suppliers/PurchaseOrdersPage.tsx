@@ -384,9 +384,9 @@ export default function PurchaseOrdersPage() {
               </Paper>
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-            <Button onClick={() => setPoDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={createPOMutation.isPending}>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => setPoDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={createPOMutation.isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>
               {createPOMutation.isPending ? t('common.processing') : t('common.create')}
             </Button>
           </DialogActions>

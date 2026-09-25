@@ -336,9 +336,9 @@ export default function InventoryPage() {
               <TextField label={t('inventory.adjustmentReason')} fullWidth multiline rows={2} {...adjustForm.register('reason')} />
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-            <Button onClick={() => setAdjustDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={adjustMutation.isPending}>{t('common.save')}</Button>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => setAdjustDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={adjustMutation.isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{t('common.save')}</Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -357,9 +357,9 @@ export default function InventoryPage() {
               <TextField label={t('inventory.adjustmentReason')} fullWidth multiline rows={2} {...transferForm.register('reason')} />
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-            <Button onClick={() => setTransferDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={transferMutation.isPending}>{t('inventory.transferStock')}</Button>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => setTransferDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={transferMutation.isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{t('inventory.transferStock')}</Button>
           </DialogActions>
         </form>
       </Dialog>

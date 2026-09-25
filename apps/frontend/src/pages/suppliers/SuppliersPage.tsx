@@ -307,9 +307,9 @@ export default function SuppliersPage() {
               </Accordion>
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider' }}>
-            <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={isPending}>{isPending ? t('common.processing') : t('common.save')}</Button>
+          <DialogActions sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper', zIndex: 10, borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={handleCloseDialog} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{isPending ? t('common.processing') : t('common.save')}</Button>
           </DialogActions>
         </form>
       </Dialog>
