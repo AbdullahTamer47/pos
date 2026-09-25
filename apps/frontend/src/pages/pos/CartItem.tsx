@@ -23,17 +23,22 @@ import { formatCurrency as formatCur } from '@smartpos/utils';
 const ItemRow = styled(Box)<{ swiped: boolean }>(({ theme, swiped }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1.2),
-  padding: theme.spacing(1.2, 1.5),
-  borderRadius: 18, // M3 Rounded List Item
+  gap: theme.spacing(1),
+  padding: theme.spacing(1, 1.25),
+  borderRadius: 16,
   backgroundColor: theme.palette.surfaceContainerLow || theme.palette.background.paper,
   border: `1px solid ${theme.palette.outlineVariant || theme.palette.divider}`,
-  minHeight: 68,
+  minHeight: 56,
   position: 'relative',
   overflow: 'hidden',
   transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
   transform: swiped ? 'translateX(-80px)' : 'translateX(0)',
   touchAction: 'pan-y',
+  [theme.breakpoints.down('sm')]: {
+    minHeight: 50,
+    padding: theme.spacing(0.75, 1),
+    borderRadius: 14,
+  },
   '&:hover': {
     borderColor: alpha(theme.palette.primary.main, 0.4),
     boxShadow: theme.shadows[2],
@@ -66,13 +71,17 @@ const StepperContainer = styled(Box)(({ theme }) => ({
 }));
 
 const StepperButton = styled(IconButton)(({ theme }) => ({
-  width: 28,
-  height: 28,
+  width: 30,
+  height: 30,
   borderRadius: '50%',
   backgroundColor: theme.palette.surfaceContainerLowest || theme.palette.background.paper,
   color: theme.palette.text.primary,
   boxShadow: theme.shadows[1],
   transition: 'all 0.15s ease',
+  [theme.breakpoints.down('sm')]: {
+    width: 28,
+    height: 28,
+  },
   '&:hover': {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
@@ -144,8 +153,7 @@ export function CartItem({ item, onUpdateQuantity, onUpdateDiscount, onRemove }:
     item.discount > 0 ? String(item.discount) : ''
   );
   const [showDiscount, setShowDiscount] = useState(item.discount > 0);
-  const touchStartRef = useRef(0);
-  const touchCurrentRef = useRef(0);
+  const touchStartPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const theme = useTheme();
 
   useEffect(() => {
@@ -166,24 +174,28 @@ export function CartItem({ item, onUpdateQuantity, onUpdateDiscount, onRemove }:
   const total = afterDiscount + taxAmount;
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartRef.current = e.touches[0]!.clientX;
+    touchStartPos.current = {
+      x: e.touches[0]!.clientX,
+      y: e.touches[0]!.clientY,
+    };
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    touchCurrentRef.current = e.touches[0]!.clientX;
-    const diff = touchStartRef.current - touchCurrentRef.current;
-    if (diff > 40) {
-      setSwiped(true);
-    } else if (diff < -20) {
-      setSwiped(false);
+    const deltaX = touchStartPos.current.x - e.touches[0]!.clientX;
+    const deltaY = Math.abs(touchStartPos.current.y - e.touches[0]!.clientY);
+
+    // Only swipe if horizontal movement is dominant (avoid accidental swipe when scrolling vertically)
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > deltaY * 1.8) {
+      if (deltaX > 45) {
+        setSwiped(true);
+      } else if (deltaX < -20) {
+        setSwiped(false);
+      }
     }
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    const diff = touchStartRef.current - touchCurrentRef.current;
-    if (diff > 80) {
-      setSwiped(true);
-    }
+    // Keep swiped state if already swiped, otherwise do nothing
   }, []);
 
   const handleSwipeDelete = useCallback(() => {

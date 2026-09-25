@@ -124,22 +124,24 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
           </Typography>
         </Box>
       )}
-      <Toolbar sx={{ minHeight: 64, px: { xs: 2, sm: 3 }, gap: 1.5 }}>
+      <Toolbar sx={{ minHeight: { xs: 48, sm: 64 }, px: { xs: 1.5, sm: 3 }, gap: 1 }}>
         {isMobile && (
-          <IconButton edge="start" onClick={onMenuClick} sx={{ borderRadius: '50%', p: 1 }}>
+          <IconButton edge="start" onClick={onMenuClick} sx={{ borderRadius: '50%', p: 0.75 }}>
             <MenuIcon />
           </IconButton>
         )}
 
         <Typography
-          variant="titleMedium"
+          variant="subtitle1"
           sx={{
             fontWeight: 800,
             flex: 1,
-            display: { xs: 'none', sm: 'block' },
+            display: 'block',
             letterSpacing: '-0.25px',
             color: theme.palette.text.primary,
+            fontSize: { xs: '0.95rem', sm: '1.15rem' },
           }}
+          noWrap
         >
           Smart POS
         </Typography>

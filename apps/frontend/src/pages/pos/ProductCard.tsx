@@ -22,6 +22,10 @@ const CardContainer = styled(Box)(({ theme }) => ({
   transition: 'all 0.25s cubic-bezier(0.2, 0, 0, 1)',
   minHeight: 180,
   position: 'relative',
+  [theme.breakpoints.down('sm')]: {
+    minHeight: 128,
+    borderRadius: 14,
+  },
   '&:hover': {
     transform: 'translateY(-3px)',
     boxShadow: theme.shadows[4],
@@ -50,6 +54,9 @@ const ImageContainer = styled(Box)<{ hasImage?: boolean }>(({ theme, hasImage })
   position: 'relative',
   overflow: 'hidden',
   transition: 'height 0.2s ease',
+  [theme.breakpoints.down('sm')]: {
+    height: hasImage ? 64 : 44,
+  },
 }));
 
 const ProductImage = styled('img')({
@@ -80,6 +87,12 @@ const StockBadge = styled(Box)<{ status: 'green' | 'yellow' | 'red' }>(({ theme,
     display: 'flex',
     alignItems: 'center',
     gap: 4,
+    [theme.breakpoints.down('sm')]: {
+      top: 4,
+      right: 4,
+      padding: '1px 6px',
+      fontSize: '0.58rem',
+    },
     '&::before': {
       content: '""',
       width: 6,
@@ -97,6 +110,10 @@ const ContentArea = styled(Box)(({ theme }) => ({
   gap: 4,
   flex: 1,
   justifyContent: 'space-between',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(0.75, 1, 0.75),
+    gap: 2,
+  },
 }));
 
 const PricePill = styled(Box)(({ theme }) => ({
@@ -108,6 +125,10 @@ const PricePill = styled(Box)(({ theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: 700,
   fontSize: '0.8125rem',
+  [theme.breakpoints.down('sm')]: {
+    padding: '2px 6px',
+    fontSize: '0.74rem',
+  },
 }));
 
 const QuickAddButton = styled(IconButton)(({ theme }) => ({
@@ -118,6 +139,10 @@ const QuickAddButton = styled(IconButton)(({ theme }) => ({
   height: 34,
   transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
   boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.3)}`,
+  [theme.breakpoints.down('sm')]: {
+    width: 28,
+    height: 28,
+  },
   '&:hover': {
     backgroundColor: theme.palette.primary.dark,
     transform: 'scale(1.1)',

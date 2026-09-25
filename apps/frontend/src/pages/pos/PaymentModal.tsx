@@ -23,6 +23,7 @@ import {
   styled,
   alpha,
   useTheme,
+  useMediaQuery,
   SelectChangeEvent,
 } from '@mui/material';
 import {
@@ -57,6 +58,12 @@ const PaymentMethodButton = styled(ToggleButton)(({ theme }) => ({
   borderRadius: '20px !important',
   border: `1px solid ${theme.palette.outlineVariant || theme.palette.divider} !important`,
   transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
+  [theme.breakpoints.down('sm')]: {
+    minWidth: 0,
+    padding: theme.spacing(1, 0.5),
+    borderRadius: '14px !important',
+    gap: theme.spacing(0.4),
+  },
   '&.Mui-selected': {
     borderColor: `${theme.palette.primary.main} !important`,
     backgroundColor: `${alpha(theme.palette.primary.main, 0.14)} !important`,
@@ -71,9 +78,16 @@ const AmountInput = styled(TextField)(({ theme }) => ({
     fontSize: '1.65rem',
     fontWeight: 800,
     backgroundColor: theme.palette.surfaceContainerLowest || theme.palette.background.paper,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1.25rem',
+      borderRadius: 14,
+    },
     '& input': {
       textAlign: 'center',
       padding: '16px',
+      [theme.breakpoints.down('sm')]: {
+        padding: '10px',
+      },
     },
     '& fieldset': {
       borderColor: theme.palette.outlineVariant || theme.palette.divider,
@@ -152,6 +166,7 @@ export function PaymentModal({
 }: PaymentModalProps) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [activeMethod, setActiveMethod] = useState<PaymentMethod>('cash');
   const [amountInput, setAmountInput] = useState('');
@@ -485,12 +500,13 @@ export function PaymentModal({
     <Dialog
       open={open}
       onClose={handleClose}
+      fullScreen={isMobile}
       maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '28px', // M3 Expressive Dialog Radius
-          maxHeight: '90vh',
+          borderRadius: isMobile ? 0 : '28px', // M3 Expressive Dialog Radius
+          maxHeight: isMobile ? '100%' : '90vh',
           boxShadow: theme.shadows[8],
         },
       }}
@@ -653,11 +669,21 @@ export function PaymentModal({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, gap: 1.5 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 1.5, sm: 3 },
+          gap: 1.5,
+          position: isMobile ? 'sticky' : 'relative',
+          bottom: 0,
+          bgcolor: 'background.paper',
+          borderTop: isMobile ? `1px solid ${theme.palette.divider}` : 'none',
+          zIndex: 10,
+        }}
+      >
         <Button
           onClick={handleClose}
           disabled={isProcessing}
-          sx={{ minHeight: 48, borderRadius: 9999, px: 3, fontWeight: 600 }}
+          sx={{ minHeight: 48, borderRadius: 9999, px: { xs: 2, sm: 3 }, fontWeight: 600 }}
         >
           {t('common.cancel')}
         </Button>

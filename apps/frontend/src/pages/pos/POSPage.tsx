@@ -18,6 +18,9 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -44,6 +47,7 @@ import {
   SwapHoriz as SwapHorizIcon,
   ExpandLess,
   ExpandMore,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -90,15 +94,27 @@ const TopCommandBar = styled(Box)(({ theme }) => ({
   flexShrink: 0,
   flexWrap: 'nowrap',
   boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+  [theme.breakpoints.down('sm')]: {
+    minHeight: 44,
+    padding: theme.spacing(0.5, 1),
+    gap: theme.spacing(0.75),
+  },
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
   flex: '1 1 340px',
   maxWidth: 480,
+  [theme.breakpoints.down('sm')]: {
+    flex: '1 1 auto',
+    maxWidth: '100%',
+  },
   '& .MuiOutlinedInput-root': {
     backgroundColor: theme.palette.surfaceContainerHighest || alpha(theme.palette.primary.main, 0.05),
     borderRadius: 9999, // M3 Expressive Full Pill
     transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
+    [theme.breakpoints.down('sm')]: {
+      height: 36,
+    },
     '& fieldset': {
       borderColor: theme.palette.outlineVariant || 'transparent',
       borderWidth: '1px',
@@ -115,6 +131,10 @@ const SearchField = styled(TextField)(({ theme }) => ({
     padding: '8px 16px',
     fontSize: '0.9rem',
     fontWeight: 500,
+    [theme.breakpoints.down('sm')]: {
+      padding: '4px 10px',
+      fontSize: '0.82rem',
+    },
   },
 }));
 
@@ -127,7 +147,12 @@ const CategoryRibbon = styled(Box)(({ theme }) => ({
   flexShrink: 0,
   backgroundColor: theme.palette.surfaceContainerLowest || theme.palette.background.default,
   borderBottom: `1px solid ${theme.palette.outlineVariant || theme.palette.divider}`,
-  '&::-webkit-scrollbar': { height: 4 },
+  WebkitOverflowScrolling: 'touch',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(0.35, 1),
+    gap: theme.spacing(0.6),
+  },
+  '&::-webkit-scrollbar': { height: 3 },
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: alpha(theme.palette.primary.main, 0.2),
     borderRadius: 9999,
@@ -174,8 +199,8 @@ const TerminalCartPanel = styled(Box, {
     boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
     flexShrink: 0,
     transition: 'height 0.25s cubic-bezier(0.2, 0, 0, 1), max-height 0.25s cubic-bezier(0.2, 0, 0, 1)',
-    height: mobileMode === 'collapsed' ? '54px' : mobileMode === 'expanded' ? '72vh' : '285px',
-    maxHeight: mobileMode === 'collapsed' ? '54px' : mobileMode === 'expanded' ? '82vh' : '300px',
+    height: mobileMode === 'collapsed' ? '50px' : mobileMode === 'expanded' ? '80vh' : '230px',
+    maxHeight: mobileMode === 'collapsed' ? '50px' : mobileMode === 'expanded' ? '85vh' : '240px',
   },
 }));
 
@@ -318,6 +343,7 @@ export default function POSPage() {
   const [quotationsListOpen, setQuotationsListOpen] = useState(false);
   const [printQuotationOpen, setPrintQuotationOpen] = useState(false);
   const [quickProductOpen, setQuickProductOpen] = useState(false);
+  const [customerPickerOpen, setCustomerPickerOpen] = useState(false);
   const [activeQuotationToPrint, setActiveQuotationToPrint] = useState<Record<string, any> | null>(null);
   const [lastCompletedItems, setLastCompletedItems] = useState<any[]>([]);
 
@@ -1131,7 +1157,7 @@ export default function POSPage() {
       <TopCommandBar>
         {/* Search & Barcode Scanner Pill */}
         <SearchField
-          placeholder="ابحث بالاسم، الكود، أو الباركود... (F1)"
+          placeholder={isMobile ? "بحث بالاسم أو الباركود..." : "ابحث بالاسم، الكود، أو الباركود... (F1)"}
           value={localSearch}
           onChange={(e) => debouncedSearch(e.target.value)}
           onKeyDown={(e) => {
@@ -1195,108 +1221,193 @@ export default function POSPage() {
         />
 
         {/* Action Controls */}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Button
-            variant="outlined"
-            size="medium"
-            onClick={() => setQuickProductOpen(true)}
-            startIcon={<FlashIcon />}
-            sx={{
-              borderRadius: 9999,
-              px: 2,
-              minHeight: 40,
-              fontWeight: 700,
-              borderColor: alpha(theme.palette.primary.main, 0.3),
-              '&:hover': { borderColor: theme.palette.primary.main },
-            }}
-          >
-            صنف حر (F7)
-          </Button>
+        {isMobile ? (
+          <Stack direction="row" spacing={0.6} alignItems="center" sx={{ flexShrink: 0 }}>
+            <Tooltip title="صنف حر (F7)">
+              <IconButton
+                size="small"
+                onClick={() => setQuickProductOpen(true)}
+                sx={{
+                  borderRadius: '50%',
+                  p: 0.75,
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  color: 'primary.main',
+                }}
+              >
+                <FlashIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-          <Button
-            variant="outlined"
-            size="medium"
-            disabled={cart.length === 0}
-            onClick={() => {
-              const heldId = holdCurrentInvoice();
-              if (heldId) {
-                toast.success('تم تعليق الفاتورة بنجاح');
-              } else {
-                toast.error('السلة فارغة، لا يمكن تعليق فاتورة فارغة');
-              }
-            }}
-            startIcon={<HoldIcon />}
-            sx={{
-              borderRadius: 9999,
-              px: 2,
-              minHeight: 40,
-              fontWeight: 700,
-            }}
-          >
-            تعليق (F3)
-          </Button>
+            <Tooltip title={`الفواتير المعلقة (${heldInvoices?.length || 0})`}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  if (cart.length > 0 && (heldInvoices?.length || 0) === 0) {
+                    const heldId = holdCurrentInvoice();
+                    if (heldId) toast.success('تم تعليق الفاتورة بنجاح');
+                  } else {
+                    setHeldDialogOpen(true);
+                  }
+                }}
+                sx={{
+                  borderRadius: '50%',
+                  p: 0.75,
+                  bgcolor: (heldInvoices?.length || 0) > 0 ? alpha(theme.palette.warning.main, 0.15) : 'transparent',
+                  color: (heldInvoices?.length || 0) > 0 ? 'warning.main' : 'text.secondary',
+                  border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
+                }}
+              >
+                <Badge badgeContent={heldInvoices?.length || 0} color="warning">
+                  <HeldFolderIcon fontSize="small" />
+                </Badge>
+              </IconButton>
+            </Tooltip>
 
-          <Button
-            variant="outlined"
-            size="medium"
-            onClick={() => setHeldDialogOpen(true)}
-            startIcon={
-              <Badge badgeContent={heldInvoices?.length || 0} color="warning">
-                <HeldFolderIcon />
-              </Badge>
-            }
-            sx={{
-              borderRadius: 9999,
-              px: { xs: 1.5, sm: 2 },
-              minHeight: 40,
-              fontWeight: 700,
-            }}
-          >
-            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>الفواتير المعلقة</Box>
-            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>معلقة</Box> ({heldInvoices?.length || 0})
-          </Button>
+            <Tooltip title="فاتورة جديدة">
+              <IconButton
+                size="small"
+                onClick={() => {
+                  if (cart.length > 0) {
+                    if (window.confirm('هل تريد بدء بيع جديد وتفريغ السلة؟')) {
+                      clearCart();
+                    }
+                  } else {
+                    toast('السلة فارغة بالفعل');
+                  }
+                }}
+                sx={{
+                  borderRadius: '50%',
+                  p: 0.75,
+                  bgcolor: theme.palette.primary.main,
+                  color: '#fff',
+                  boxShadow: theme.shadows[1],
+                  '&:hover': { bgcolor: theme.palette.primary.dark },
+                }}
+              >
+                <NewSaleIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-          <Button
-            variant="outlined"
-            size="medium"
-            onClick={() => setQuotationsListOpen(true)}
-            startIcon={<QuoteIcon />}
-            sx={{
-              borderRadius: 9999,
-              px: { xs: 1.5, sm: 2 },
-              minHeight: 40,
-              fontWeight: 700,
-              display: { xs: 'none', sm: 'inline-flex' },
-            }}
-          >
-            عروض الأسعار (F9)
-          </Button>
+            <Tooltip title={mobileCartMode === 'collapsed' ? 'شاشة منقسمة' : mobileCartMode === 'split' ? 'عرض السلة كاملة' : 'عرض الأصناف'}>
+              <IconButton
+                size="small"
+                onClick={() => setMobileCartMode((prev) => (prev === 'collapsed' ? 'split' : prev === 'split' ? 'expanded' : 'split'))}
+                sx={{
+                  borderRadius: '50%',
+                  p: 0.75,
+                  bgcolor: cart.length > 0 ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
+                  border: `1px solid ${cart.length > 0 ? theme.palette.primary.main : alpha(theme.palette.divider, 0.8)}`,
+                  color: cart.length > 0 ? 'primary.main' : 'text.secondary',
+                }}
+              >
+                <Badge badgeContent={totalCartUnits} color="primary">
+                  <CartIcon fontSize="small" />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        ) : (
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Button
+              variant="outlined"
+              size="medium"
+              onClick={() => setQuickProductOpen(true)}
+              startIcon={<FlashIcon />}
+              sx={{
+                borderRadius: 9999,
+                px: 2,
+                minHeight: 40,
+                fontWeight: 700,
+                borderColor: alpha(theme.palette.primary.main, 0.3),
+                '&:hover': { borderColor: theme.palette.primary.main },
+              }}
+            >
+              صنف حر (F7)
+            </Button>
 
-          <Button
-            variant="contained"
-            color="primary"
-            size="medium"
-            onClick={() => {
-              if (cart.length > 0) {
-                if (window.confirm('هل تريد بدء بيع جديد وتفريغ السلة؟')) {
-                  clearCart();
+            <Button
+              variant="outlined"
+              size="medium"
+              disabled={cart.length === 0}
+              onClick={() => {
+                const heldId = holdCurrentInvoice();
+                if (heldId) {
+                  toast.success('تم تعليق الفاتورة بنجاح');
+                } else {
+                  toast.error('السلة فارغة، لا يمكن تعليق فاتورة فارغة');
                 }
-              }
-            }}
-            startIcon={<NewSaleIcon />}
-            sx={{
-              borderRadius: 9999,
-              px: { xs: 1.5, sm: 2.5 },
-              minHeight: 40,
-              fontWeight: 800,
-              boxShadow: theme.shadows[2],
-            }}
-          >
-            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>فاتورة جديدة</Box>
-            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>جديدة</Box>
-          </Button>
+              }}
+              startIcon={<HoldIcon />}
+              sx={{
+                borderRadius: 9999,
+                px: 2,
+                minHeight: 40,
+                fontWeight: 700,
+              }}
+            >
+              تعليق (F3)
+            </Button>
 
-          {!isMobile && (
+            <Button
+              variant="outlined"
+              size="medium"
+              onClick={() => setHeldDialogOpen(true)}
+              startIcon={
+                <Badge badgeContent={heldInvoices?.length || 0} color="warning">
+                  <HeldFolderIcon />
+                </Badge>
+              }
+              sx={{
+                borderRadius: 9999,
+                px: { xs: 1.5, sm: 2 },
+                minHeight: 40,
+                fontWeight: 700,
+              }}
+            >
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>الفواتير المعلقة</Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>معلقة</Box> ({heldInvoices?.length || 0})
+            </Button>
+
+            <Button
+              variant="outlined"
+              size="medium"
+              onClick={() => setQuotationsListOpen(true)}
+              startIcon={<QuoteIcon />}
+              sx={{
+                borderRadius: 9999,
+                px: { xs: 1.5, sm: 2 },
+                minHeight: 40,
+                fontWeight: 700,
+                display: { xs: 'none', sm: 'inline-flex' },
+              }}
+            >
+              عروض الأسعار (F9)
+            </Button>
+
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              onClick={() => {
+                if (cart.length > 0) {
+                  if (window.confirm('هل تريد بدء بيع جديد وتفريغ السلة؟')) {
+                    clearCart();
+                  }
+                }
+              }}
+              startIcon={<NewSaleIcon />}
+              sx={{
+                borderRadius: 9999,
+                px: { xs: 1.5, sm: 2.5 },
+                minHeight: 40,
+                fontWeight: 800,
+                boxShadow: theme.shadows[2],
+              }}
+            >
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>فاتورة جديدة</Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>جديدة</Box>
+            </Button>
+
             <Button
               variant="outlined"
               size="medium"
@@ -1313,8 +1424,8 @@ export default function POSPage() {
             >
               مكان السلة: {cartPosition === 'right' ? 'يمين' : 'يسار'}
             </Button>
-          )}
-        </Stack>
+          </Stack>
+        )}
       </TopCommandBar>
 
       {/* ================= CATEGORY PILLS RIBBON ================= */}
@@ -1322,15 +1433,17 @@ export default function POSPage() {
         <Chip
           label="🌟 جميع الأصناف"
           clickable
+          size={isMobile ? 'small' : 'medium'}
           color={!selectedCategory ? 'primary' : 'default'}
           variant={!selectedCategory ? 'filled' : 'outlined'}
           onClick={() => setSelectedCategory(null)}
           sx={{
             borderRadius: 9999,
-            px: 1.5,
-            py: 2.2,
+            px: isMobile ? 1 : 1.5,
+            py: isMobile ? 0.35 : 2.2,
+            height: isMobile ? 28 : undefined,
             fontWeight: 800,
-            fontSize: '0.9rem',
+            fontSize: isMobile ? '0.78rem' : '0.9rem',
             boxShadow: !selectedCategory ? theme.shadows[2] : 'none',
           }}
         />
@@ -1342,15 +1455,17 @@ export default function POSPage() {
               key={cat.id}
               label={`${icon} ${cat.name}${cat.productCount ? ` (${cat.productCount})` : ''}`}
               clickable
+              size={isMobile ? 'small' : 'medium'}
               color={isSelected ? 'primary' : 'default'}
               variant={isSelected ? 'filled' : 'outlined'}
               onClick={() => setSelectedCategory(cat.id)}
               sx={{
                 borderRadius: 9999,
-                px: 1.5,
-                py: 2.2,
+                px: isMobile ? 1 : 1.5,
+                py: isMobile ? 0.35 : 2.2,
+                height: isMobile ? 28 : undefined,
                 fontWeight: isSelected ? 800 : 600,
-                fontSize: '0.88rem',
+                fontSize: isMobile ? '0.78rem' : '0.88rem',
                 boxShadow: isSelected ? theme.shadows[2] : 'none',
                 borderColor: isSelected ? theme.palette.primary.main : theme.palette.outlineVariant || theme.palette.divider,
                 backgroundColor: isSelected
@@ -1469,8 +1584,8 @@ export default function POSPage() {
                   lg: 'repeat(4, 1fr)',
                   xl: 'repeat(5, 1fr)',
                 },
-                gap: 2,
-                p: 2,
+                gap: { xs: 1, sm: 1.5, md: 2 },
+                p: { xs: 1, sm: 1.5, md: 2 },
                 overflowY: 'auto',
                 flex: 1,
                 minHeight: 0,
@@ -1524,29 +1639,51 @@ export default function POSPage() {
         <TerminalCartPanel mobileMode={mobileCartMode} sx={{ order: 2 }}>
           {/* Cart Header: Status & Controls */}
           <CartHeader sx={{ py: isMobile ? 0.75 : 1, px: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                 <Box
                   sx={{
-                    width: 9,
-                    height: 9,
+                    width: 8,
+                    height: 8,
                     borderRadius: '50%',
                     backgroundColor: 'success.main',
-                    boxShadow: '0 0 8px rgba(76, 175, 80, 0.6)',
+                    boxShadow: '0 0 6px rgba(76, 175, 80, 0.6)',
+                    flexShrink: 0,
                   }}
                 />
-                <Typography variant="subtitle2" fontWeight={800} color="text.primary">
+                <Typography variant="subtitle2" fontWeight={800} color="text.primary" noWrap sx={{ fontSize: { xs: '0.82rem', sm: '0.88rem' } }}>
                   طلب بيع مباشر #1
                 </Typography>
                 <Chip
                   label={`${totalCartUnits} قطعة`}
                   size="small"
                   color="primary"
-                  sx={{ borderRadius: 9999, fontWeight: 700, height: 20, fontSize: '0.72rem' }}
+                  sx={{ borderRadius: 9999, fontWeight: 700, height: 18, fontSize: '0.7rem' }}
                 />
               </Box>
 
               <Stack direction="row" spacing={0.5} alignItems="center">
+                {/* Mobile customer button */}
+                {isMobile && (
+                  <Chip
+                    icon={<PersonIcon sx={{ fontSize: '15px !important' }} />}
+                    label={selectedCustomer ? selectedCustomer.name : 'زبون نقدي'}
+                    size="small"
+                    variant="outlined"
+                    clickable
+                    onClick={() => setCustomerPickerOpen(true)}
+                    sx={{
+                      borderRadius: 9999,
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      height: 24,
+                      maxWidth: 130,
+                      borderColor: selectedCustomer ? 'primary.main' : alpha(theme.palette.divider, 0.8),
+                      bgcolor: selectedCustomer ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                    }}
+                  />
+                )}
+
                 {cart.length > 0 && (
                   <Tooltip title="تفريغ السلة">
                     <IconButton
@@ -1557,7 +1694,7 @@ export default function POSPage() {
                           clearCart();
                         }
                       }}
-                      sx={{ borderRadius: 9999, p: 0.5 }}
+                      sx={{ borderRadius: '50%', p: 0.5 }}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -1565,14 +1702,14 @@ export default function POSPage() {
                 )}
 
                 {isMobile && (
-                  <Tooltip title={mobileCartMode === 'collapsed' ? 'توسيع الفاتورة' : mobileCartMode === 'expanded' ? 'تصغير إلى شاشة منقسمة' : 'توسيع التفاصيل'}>
+                  <Tooltip title={mobileCartMode === 'collapsed' ? 'شاشة منقسمة' : mobileCartMode === 'split' ? 'توسيع الفاتورة' : 'تصغير الشاشة'}>
                     <IconButton
                       size="small"
                       color="primary"
                       onClick={() => {
                         setMobileCartMode((prev) => (prev === 'collapsed' ? 'split' : prev === 'split' ? 'expanded' : 'split'));
                       }}
-                      sx={{ borderRadius: 9999, p: 0.5, bgcolor: alpha(theme.palette.primary.main, 0.08) }}
+                      sx={{ borderRadius: '50%', p: 0.5, bgcolor: alpha(theme.palette.primary.main, 0.08) }}
                     >
                       {mobileCartMode === 'expanded' ? <ExpandMore fontSize="small" /> : <ExpandLess fontSize="small" />}
                     </IconButton>
@@ -1583,10 +1720,12 @@ export default function POSPage() {
 
             {/* Customer Selector Capsule - Always Accessible on desktop, or when expanded on mobile */}
             {(!isMobile || mobileCartMode === 'expanded') && (
-              <CustomerSelect
-                value={selectedCustomer ?? undefined}
-                onChange={(c) => setCustomer(c ?? null)}
-              />
+              <Box sx={{ mt: 0.5 }}>
+                <CustomerSelect
+                  value={selectedCustomer ?? undefined}
+                  onChange={(c) => setCustomer(c ?? null)}
+                />
+              </Box>
             )}
           </CartHeader>
 
@@ -1653,8 +1792,8 @@ export default function POSPage() {
             )}
           </CartStream>
 
-          {/* Direct Invoice Discount & Delivery Fee Row */}
-          {cart.length > 0 && (
+          {/* Direct Invoice Discount & Delivery Fee Row - Shown on desktop or when expanded on mobile */}
+          {cart.length > 0 && (!isMobile || mobileCartMode === 'expanded') && (
             <Box sx={{ px: 2, py: 1.2, borderTop: `1px solid ${theme.palette.outlineVariant || theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <TextField
@@ -2201,6 +2340,36 @@ export default function POSPage() {
         onClose={() => setQuickProductOpen(false)}
         onAddCustomProduct={(prod: any, qty: number) => addToCart(prod, qty)}
       />
+
+      {/* Mobile Customer Picker Dialog */}
+      <Dialog
+        open={customerPickerOpen}
+        onClose={() => setCustomerPickerOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        PaperProps={{ sx: { borderRadius: '24px', p: 1 } }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <PersonIcon color="primary" />
+            <Typography variant="subtitle1" fontWeight={800}>
+              تحديد عميل الفاتورة
+            </Typography>
+          </Box>
+          <IconButton size="small" onClick={() => setCustomerPickerOpen(false)}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1.5, pb: 2 }}>
+          <CustomerSelect
+            value={selectedCustomer ?? undefined}
+            onChange={(c) => {
+              setCustomer(c ?? null);
+              setCustomerPickerOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </StyledContainer>
   );
 }
