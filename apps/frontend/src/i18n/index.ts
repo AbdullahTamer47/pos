@@ -18,6 +18,11 @@ i18n
     fallbackLng: 'ar',
     lng: 'ar',
     debug: false,
+    parseMissingKeyHandler: (key: string, defaultValue?: string) => {
+      if (defaultValue) return defaultValue;
+      const parts = key.split('.');
+      return parts[parts.length - 1] || key;
+    },
     interpolation: {
       escapeValue: false,
     },

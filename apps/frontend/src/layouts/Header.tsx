@@ -148,7 +148,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
-          <Tooltip title={isDark ? (t('common.lightMode') || 'Light mode') : (t('common.darkMode') || 'Dark mode')}>
+          <Tooltip title={isDark ? t('common.lightMode', 'الوضع النهاري') : t('common.darkMode', 'الوضع الليلي')}>
             <IconButton
               size="medium"
               onClick={toggleMode}
@@ -161,7 +161,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={t('common.notifications') || 'Notifications'}>
+          <Tooltip title={t('common.notifications', 'الإشعارات')}>
             <IconButton
               size="medium"
               onClick={(e) => setNotifAnchor(e.currentTarget)}
@@ -359,16 +359,16 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
           )}
           <MenuItem onClick={() => { setAnchorEl(null); navigate('/settings'); }}>
             <ListItemIcon><Settings fontSize="small" /></ListItemIcon>
-            <ListItemText>{t('nav.settings') || 'Settings'}</ListItemText>
+            <ListItemText>{t('nav.settings', 'الإعدادات')}</ListItemText>
           </MenuItem>
           <MenuItem onClick={() => { setAnchorEl(null); navigate('/profile'); }}>
             <ListItemIcon><Person fontSize="small" /></ListItemIcon>
-            <ListItemText>{t('nav.profile') || 'Profile'}</ListItemText>
+            <ListItemText>{t('nav.profile', 'الملف الشخصي')}</ListItemText>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
-            <ListItemText>{t('auth.logout') || 'Logout'}</ListItemText>
+            <ListItemText>{t('auth.logout', 'تسجيل الخروج')}</ListItemText>
           </MenuItem>
         </Menu>
 

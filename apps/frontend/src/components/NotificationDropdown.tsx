@@ -80,7 +80,7 @@ export function NotificationDropdown({ anchorEl, onClose }: NotificationDropdown
 
   const markAllReadMut = useMutation({
     mutationFn: () => api.notifications.markAllAsRead(),
-    meta: { successMsg: t('notifications.allMarkedRead') || 'All notifications marked as read' },
+    meta: { successMsg: t('notifications.allMarkedRead', 'تم تحديد جميع الإشعارات كمقروءة') },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
@@ -142,7 +142,7 @@ export function NotificationDropdown({ anchorEl, onClose }: NotificationDropdown
         <Stack direction="row" spacing={1} alignItems="center">
           <Notifications fontSize="small" />
           <Typography variant="subtitle2" fontWeight={700}>
-            {t('common.notifications') || 'Notifications'}
+            {t('common.notifications', 'الإشعارات')}
           </Typography>
         </Stack>
         {hasUnread && (
@@ -152,7 +152,7 @@ export function NotificationDropdown({ anchorEl, onClose }: NotificationDropdown
             disabled={markAllReadMut.isPending}
             onClick={() => markAllReadMut.mutate()}
           >
-            {t('notifications.markAllRead') || 'Mark all read'}
+            {t('notifications.markAllRead', 'تحديد الكل كمقروء')}
           </Button>
         )}
       </Box>
@@ -166,7 +166,7 @@ export function NotificationDropdown({ anchorEl, onClose }: NotificationDropdown
           <Box sx={{ textAlign: 'center', py: 5, px: 2 }}>
             <NotificationsOff sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
             <Typography variant="body2" color="text.secondary">
-              {t('notifications.empty') || 'No notifications'}
+              {t('notifications.empty', 'لا توجد إشعارات')}
             </Typography>
           </Box>
         ) : (
@@ -248,7 +248,7 @@ export function NotificationDropdown({ anchorEl, onClose }: NotificationDropdown
             onClose();
           }}
         >
-          {t('notifications.viewAll') || 'View all notifications'}
+          {t('notifications.viewAll', 'عرض جميع الإشعارات')}
         </Button>
       </Box>
     </Popover>
