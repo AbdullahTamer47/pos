@@ -3,7 +3,7 @@ import {
   Box, Typography, Stack, Card, CardContent, Tabs, Tab, Chip, Button, IconButton, Tooltip,
   Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination,
   Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, Avatar, alpha,
-  useTheme, Divider, Grid, MenuItem,
+  useTheme, useMediaQuery, Divider, Grid, MenuItem,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon, Phone as PhoneIcon, Email as EmailIcon, Edit as EditIcon,
@@ -69,6 +69,7 @@ interface Address {
 export default function CustomerDetailPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -241,13 +242,13 @@ export default function CustomerDetailPage() {
           <Chip size="small" label={customer.tier || 'REGULAR'} color={TIER_COLORS[customer.tier || 'REGULAR']} variant="outlined" />
         </Stack>
 
-        <Stack direction="row" spacing={1}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ width: { xs: '100%', sm: 'auto' }, mt: { xs: 1, sm: 0 } }}>
           <Button
             variant="contained"
             color="success"
             startIcon={<CashIcon />}
             onClick={() => setPaymentDialogOpen(true)}
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ borderRadius: 2, fontWeight: 700, width: { xs: '100%', sm: 'auto' } }}
           >
             سداد دفعة نقدية 💵
           </Button>
@@ -257,7 +258,7 @@ export default function CustomerDetailPage() {
             color="primary"
             startIcon={<WhatsAppIcon />}
             onClick={handleShareWhatsApp}
-            sx={{ borderRadius: 2, fontWeight: 600 }}
+            sx={{ borderRadius: 2, fontWeight: 600, width: { xs: '100%', sm: 'auto' } }}
           >
             إرسال بالواتساب 📲
           </Button>
@@ -581,9 +582,21 @@ export default function CustomerDetailPage() {
         </form>
       </Dialog>
 
-      <Dialog open={paymentDialogOpen} onClose={() => setPaymentDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={paymentDialogOpen}
+        onClose={() => setPaymentDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 3,
+            m: isMobile ? 0 : 2,
+          },
+        }}
+      >
         <DialogTitle>تسجيل سداد دفعة للعميل</DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ p: { xs: 2, sm: 3 } }}>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Alert severity="info">
               المديونية الحالية: <strong>{formatCurrency(customer.balance)}</strong>
@@ -630,16 +643,27 @@ export default function CustomerDetailPage() {
             />
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setPaymentDialogOpen(false)} sx={{ borderRadius: 2 }}>
+        <DialogActions
+          sx={{
+            p: 2,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            position: isMobile ? 'sticky' : 'relative',
+            bottom: 0,
+            zIndex: 10,
+            bgcolor: 'background.paper',
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+          }}
+        >
+          <Button onClick={() => setPaymentDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>
             {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             color="success"
+            fullWidth={isMobile}
             onClick={() => recordPaymentMutation.mutate()}
             disabled={!payAmount || parseFloat(payAmount) <= 0 || recordPaymentMutation.isPending}
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}
           >
             تأكيد السداد 💵
           </Button>

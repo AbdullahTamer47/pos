@@ -22,6 +22,7 @@ import {
   Paper,
   alpha,
   useTheme,
+  useMediaQuery,
   Avatar,
 } from '@mui/material';
 import {
@@ -78,7 +79,7 @@ function CategoryNode({ category, level, onEdit, onDelete, onToggleActive }: Cat
           p: 1.5,
           borderRadius: 2,
           mb: 0.5,
-          ml: level * 3,
+          ml: { xs: level * 1.5, sm: level * 3 },
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
@@ -199,6 +200,7 @@ function buildCategoryTree(categories?: any): CategoryResponse[] {
 export default function CategoriesPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const queryClient = useQueryClient();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -440,12 +442,24 @@ export default function CategoriesPage() {
         </Paper>
       )}
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 3,
+            m: isMobile ? 0 : 2,
+          },
+        }}
+      >
         <DialogTitle>
           {editingCategory ? t('categories.editCategory') : t('categories.addCategory')}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
+          <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
             <Stack spacing={2.5}>
               <TextField
                 label={t('categories.categoryNameAr')}
@@ -499,9 +513,19 @@ export default function CategoriesPage() {
               />
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={isPending}>
+          <DialogActions
+            sx={{
+              p: 2,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              position: isMobile ? 'sticky' : 'relative',
+              bottom: 0,
+              bgcolor: 'background.paper',
+              zIndex: 10,
+              flexDirection: { xs: 'column-reverse', sm: 'row' },
+            }}
+          >
+            <Button onClick={handleCloseDialog} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>
               {isPending ? t('common.processing') : t('common.save')}
             </Button>
           </DialogActions>

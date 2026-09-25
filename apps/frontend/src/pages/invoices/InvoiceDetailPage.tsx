@@ -143,15 +143,15 @@ export default function InvoiceDetailPage() {
                   </Typography>
                   {invoice.branchName && <Typography variant="caption" color="text.secondary">{invoice.branchName}</Typography>}
                 </Box>
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  <Button variant="contained" color="primary" startIcon={<PrintIcon />} onClick={handlePrintThermal} sx={{ fontWeight: 700 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap" useFlexGap sx={{ width: { xs: '100%', sm: 'auto' }, mt: { xs: 1.5, sm: 0 } }}>
+                  <Button variant="contained" color="primary" startIcon={<PrintIcon />} onClick={handlePrintThermal} sx={{ fontWeight: 700, width: { xs: '100%', sm: 'auto' } }}>
                     طباعة إيصال (80mm)
                   </Button>
-                  <Button variant="outlined" color="primary" startIcon={<DescriptionIcon />} onClick={handlePrintA4} sx={{ fontWeight: 700 }}>
+                  <Button variant="outlined" color="primary" startIcon={<DescriptionIcon />} onClick={handlePrintA4} sx={{ fontWeight: 700, width: { xs: '100%', sm: 'auto' } }}>
                     فاتورة ضريبية A4
                   </Button>
-                  {canCancel && <Button variant="outlined" color="error" startIcon={<CancelIcon />} onClick={() => setCancelDialogOpen(true)}>{t('invoices.cancelInvoice')}</Button>}
-                  {canReturn && <Button variant="outlined" color="warning" startIcon={<ReturnIcon />} onClick={() => setReturnDialogOpen(true)}>{t('invoices.returnInvoice')}</Button>}
+                  {canCancel && <Button variant="outlined" color="error" startIcon={<CancelIcon />} onClick={() => setCancelDialogOpen(true)} sx={{ width: { xs: '100%', sm: 'auto' } }}>{t('invoices.cancelInvoice')}</Button>}
+                  {canReturn && <Button variant="outlined" color="warning" startIcon={<ReturnIcon />} onClick={() => setReturnDialogOpen(true)} sx={{ width: { xs: '100%', sm: 'auto' } }}>{t('invoices.returnInvoice')}</Button>}
                 </Stack>
               </Stack>
             </CardContent>
@@ -180,8 +180,8 @@ export default function InvoiceDetailPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
         <Typography variant="h6" fontWeight={600} sx={{ p: 2, pb: 0 }}>{t('invoices.items')}</Typography>
-        <TableContainer>
-          <Table>
+        <TableContainer sx={{ overflowX: 'auto' }}>
+          <Table sx={{ minWidth: { xs: 520, sm: '100%' } }}>
             <TableHead>
               <TableRow>
                 <TableCell>{t('pos.productName')}</TableCell>

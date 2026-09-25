@@ -401,7 +401,13 @@ export default function ProductFormPage() {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-          <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
+          <Tabs
+            value={tabValue}
+            onChange={(_, v) => setTabValue(v)}
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+          >
             <Tab label="البيانات الأساسية والتسعير والمخزون" />
             <Tab label="تسعير إضافي وقوائم الأسعار" />
             <Tab label={t('products.variants')} />
@@ -1012,12 +1018,21 @@ export default function ProductFormPage() {
           </Card>
         </TabPanel>
 
-        <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            gap: 2,
+            justifyContent: 'flex-end',
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+          }}
+        >
           <Button
             variant="outlined"
             size="large"
             startIcon={<CancelIcon />}
             onClick={() => navigate('/products')}
+            sx={{ width: { xs: '100%', sm: 'auto' }, minHeight: 46 }}
           >
             {t('common.cancel')}
           </Button>
@@ -1027,6 +1042,7 @@ export default function ProductFormPage() {
             startIcon={<SaveIcon />}
             type="submit"
             disabled={isPending}
+            sx={{ width: { xs: '100%', sm: 'auto' }, minHeight: 46, fontWeight: 700 }}
           >
             {isPending ? t('common.processing') : t('common.save')}
           </Button>

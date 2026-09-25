@@ -252,7 +252,7 @@ export default function LoginPage() {
       >
         <Box
           sx={{
-            mx: 2,
+            mx: { xs: 1.5, sm: 2 },
             background: isDark
               ? 'rgba(20,18,24,0.85)'
               : 'rgba(254,247,255,0.88)',
@@ -263,7 +263,7 @@ export default function LoginPage() {
             boxShadow: isDark
               ? '0px 16px 48px rgba(0,0,0,0.6)'
               : '0px 16px 48px rgba(103,80,164,0.1)',
-            p: 5,
+            p: { xs: 2.5, sm: 4.5 },
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -474,9 +474,11 @@ export default function LoginPage() {
                       px: 1,
                       justifyContent: 'flex-start',
                       fontWeight: 600,
+                      fontSize: { xs: '0.74rem', sm: '0.84rem' },
                       borderColor: theme.palette.primary.main,
                       bgcolor: alpha(theme.palette.primary.main, 0.08),
                       '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.16) },
+                      '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
                     }}
                   />
                   <Chip
@@ -490,13 +492,15 @@ export default function LoginPage() {
                       px: 1,
                       justifyContent: 'flex-start',
                       fontWeight: 600,
+                      fontSize: { xs: '0.74rem', sm: '0.84rem' },
                       borderColor: theme.palette.primary.main,
                       bgcolor: alpha(theme.palette.primary.main, 0.04),
                       '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) },
+                      '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
                     }}
                   />
                   <Chip
-                    label={i18n.language === 'ar' ? '👑 المشرف العام (مدير المنصة): admin@smartpos.com' : '👑 Super Admin: admin@smartpos.com'}
+                    label={i18n.language === 'ar' ? '👑 المشرف العام: admin@smartpos.com' : '👑 Super Admin: admin@smartpos.com'}
                     onClick={() => handleFillDemo('admin@smartpos.com', 'Admin@123456')}
                     variant="outlined"
                     clickable
@@ -506,9 +510,11 @@ export default function LoginPage() {
                       px: 1,
                       justifyContent: 'flex-start',
                       fontWeight: 600,
+                      fontSize: { xs: '0.74rem', sm: '0.84rem' },
                       borderColor: theme.palette.secondary.main,
                       bgcolor: alpha(theme.palette.secondary.main, 0.06),
                       '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.14) },
+                      '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
                     }}
                   />
                 </Stack>
