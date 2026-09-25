@@ -3,7 +3,7 @@ import {
   Box, TextField, InputAdornment, Button, Chip, Typography, IconButton, Tooltip,
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination, TableSortLabel, Paper, Dialog, DialogTitle, DialogContent,
-  DialogContentText, DialogActions, Alert, MenuItem, Avatar, alpha, useTheme,
+  DialogContentText, DialogActions, Alert, MenuItem, Avatar, alpha, useTheme, useMediaQuery,
   Accordion, AccordionSummary, AccordionDetails,
 } from '@mui/material';
 import {
@@ -54,6 +54,7 @@ function debounce(fn: (value: string) => void, delay: number): (value: string) =
 export default function CustomersPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -152,7 +153,7 @@ export default function CustomersPage() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={3} gap={2}>
         <Typography variant="h4" fontWeight={700}>{t('nav.customers')}</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>{t('customers.addCustomer')}</Button>
+        <Button variant="contained" fullWidth={isMobile} startIcon={<AddIcon />} onClick={handleOpenAdd}>{t('customers.addCustomer')}</Button>
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems="flex-start">
@@ -162,7 +163,7 @@ export default function CustomersPage() {
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: 280 }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           {TIERS.map((tier) => (
@@ -188,7 +189,7 @@ export default function CustomersPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox" />
@@ -270,8 +271,8 @@ export default function CustomersPage() {
         )}
       </Paper>
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingCustomer ? t('customers.editCustomer') : t('customers.addCustomer')}</DialogTitle>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider' }}>{editingCustomer ? t('customers.editCustomer') : t('customers.addCustomer')}</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Stack spacing={2}>
@@ -318,9 +319,9 @@ export default function CustomersPage() {
               </Accordion>
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={isPending}>{isPending ? t('common.processing') : t('common.save')}</Button>
+          <DialogActions sx={{ position: 'sticky', bottom: 0, zIndex: 10, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', p: 2, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={handleCloseDialog} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{isPending ? t('common.processing') : t('common.save')}</Button>
           </DialogActions>
         </form>
       </Dialog>

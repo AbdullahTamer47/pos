@@ -301,7 +301,14 @@ export default function CustomerDetailPage() {
         </Grid>
       </Grid>
 
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
+      <Tabs
+        value={tab}
+        onChange={(_, v) => setTab(v)}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+      >
         <Tab label={t('common.overview')} />
         <Tab label={t('customers.ledger')} />
         <Tab label={t('customers.addresses')} />
@@ -358,7 +365,7 @@ export default function CustomerDetailPage() {
       {tab === 1 && (
         <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
           <TableContainer>
-            <Table>
+            <Table sx={{ minWidth: 600 }}>
               <TableHead>
                 <TableRow>
                   <TableCell>{t('common.date')}</TableCell>
@@ -514,26 +521,26 @@ export default function CustomerDetailPage() {
         </Box>
       )}
 
-      <Dialog open={addressDialogOpen} onClose={() => { setAddressDialogOpen(false); setEditingAddress(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingAddress ? t('customers.editAddress') : t('customers.addAddress')}</DialogTitle>
+      <Dialog open={addressDialogOpen} onClose={() => { setAddressDialogOpen(false); setEditingAddress(null); }} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider' }}>{editingAddress ? t('customers.editAddress') : t('customers.addAddress')}</DialogTitle>
         <form onSubmit={addressForm.handleSubmit(editingAddress ? handleEditAddress : handleAddAddress)}>
           <DialogContent>
-            <Stack spacing={2}>
+            <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField label={t('customers.customerName')} fullWidth required {...addressForm.register('label')} error={!!addressForm.formState.errors.label} helperText={addressForm.formState.errors.label?.message} />
               <TextField label={t('common.address')} fullWidth required multiline rows={2} {...addressForm.register('address')} error={!!addressForm.formState.errors.address} helperText={addressForm.formState.errors.address?.message} />
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField label={t('common.city')} fullWidth {...addressForm.register('city')} />
                 <TextField label={t('customers.state')} fullWidth {...addressForm.register('state')} />
               </Stack>
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField label={t('customers.zipCode')} fullWidth {...addressForm.register('zipCode')} />
                 <TextField label={t('common.country')} fullWidth {...addressForm.register('country')} />
               </Stack>
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => { setAddressDialogOpen(false); setEditingAddress(null); }}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained">{t('common.save')}</Button>
+          <DialogActions sx={{ position: 'sticky', bottom: 0, zIndex: 10, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', p: 2, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => { setAddressDialogOpen(false); setEditingAddress(null); }} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{t('common.save')}</Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -549,35 +556,35 @@ export default function CustomerDetailPage() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={giftCardDialogOpen} onClose={() => setGiftCardDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('giftCards.addGiftCard')}</DialogTitle>
+      <Dialog open={giftCardDialogOpen} onClose={() => setGiftCardDialogOpen(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider' }}>{t('giftCards.addGiftCard')}</DialogTitle>
         <form onSubmit={gcForm.handleSubmit((d) => createGCMutation.mutate(d))}>
           <DialogContent>
-            <Stack spacing={2}>
+            <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField label={t('giftCards.giftCardName')} fullWidth {...gcForm.register('name')} />
               <TextField label={t('giftCards.initialBalance')} fullWidth type="number" required {...gcForm.register('initialBalance', { valueAsNumber: true })} error={!!gcForm.formState.errors.initialBalance} helperText={gcForm.formState.errors.initialBalance?.message} />
               <TextField label={t('giftCards.expiryDate')} fullWidth type="date" InputLabelProps={{ shrink: true }} {...gcForm.register('expiryDate')} />
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setGiftCardDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={createGCMutation.isPending}>{createGCMutation.isPending ? t('common.processing') : t('common.create')}</Button>
+          <DialogActions sx={{ position: 'sticky', bottom: 0, zIndex: 10, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', p: 2, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => setGiftCardDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" disabled={createGCMutation.isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{createGCMutation.isPending ? t('common.processing') : t('common.create')}</Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      <Dialog open={earnDialogOpen} onClose={() => setEarnDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{t('loyalty.earnPoints')}</DialogTitle>
+      <Dialog open={earnDialogOpen} onClose={() => setEarnDialogOpen(false)} maxWidth="xs" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider' }}>{t('loyalty.earnPoints')}</DialogTitle>
         <form onSubmit={earnForm.handleSubmit((d) => earnMutation.mutate(d))}>
           <DialogContent>
-            <Stack spacing={2}>
+            <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField label={t('loyalty.pointsBalance')} fullWidth type="number" required {...earnForm.register('points', { valueAsNumber: true })} error={!!earnForm.formState.errors.points} helperText={earnForm.formState.errors.points?.message} />
               <TextField label={t('common.description')} fullWidth {...earnForm.register('description')} />
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setEarnDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" color="success" disabled={earnMutation.isPending}>{t('loyalty.earnPoints')}</Button>
+          <DialogActions sx={{ position: 'sticky', bottom: 0, zIndex: 10, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', p: 2, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+            <Button onClick={() => setEarnDialogOpen(false)} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained" color="success" disabled={earnMutation.isPending} fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2, fontWeight: 700 }}>{t('loyalty.earnPoints')}</Button>
           </DialogActions>
         </form>
       </Dialog>

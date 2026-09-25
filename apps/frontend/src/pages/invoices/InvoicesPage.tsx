@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import {
   Box, TextField, InputAdornment, Button, Chip, Typography, IconButton, Tooltip,
   Stack, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  TablePagination, TableSortLabel, Paper, Alert, MenuItem, alpha, useTheme,
+  TablePagination, TableSortLabel, Paper, Alert, MenuItem, alpha, useTheme, useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon, Close as CloseIcon, Refresh as RefreshIcon,
@@ -34,6 +34,7 @@ function debounce(fn: (value: string) => void, delay: number): (value: string) =
 export default function InvoicesPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
@@ -97,7 +98,7 @@ export default function InvoicesPage() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={3} gap={2}>
         <Typography variant="h4" fontWeight={700}>{t('nav.invoices')}</Typography>
-        <Button variant="outlined" startIcon={<DownloadIcon />} onClick={exportToCSV}>{t('common.export')}</Button>
+        <Button variant="outlined" fullWidth={isMobile} startIcon={<DownloadIcon />} onClick={exportToCSV}>{t('common.export')}</Button>
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={2} alignItems="flex-start">
@@ -107,7 +108,7 @@ export default function InvoicesPage() {
             startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>,
             endAdornment: search ? <InputAdornment position="end"><IconButton size="small" onClick={() => { setSearch(''); setDebouncedSearch(''); }}><CloseIcon fontSize="small" /></IconButton></InputAdornment> : null,
           }}
-          sx={{ minWidth: { xs: '100%', sm: 280 }, width: { xs: '100%', sm: 280 } }}
+          sx={{ width: { xs: '100%', sm: 280 } }}
         />
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <TextField select size="small" label={t('common.type')} value={typeFilter || ''} onChange={(e) => { setTypeFilter(e.target.value || null); setPage(0); }} sx={{ minWidth: 120 }}>
@@ -136,7 +137,7 @@ export default function InvoicesPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 {columns.map((col) => (

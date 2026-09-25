@@ -20,6 +20,7 @@ import {
   Grid,
   Alert,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Print as PrintIcon,
@@ -43,6 +44,8 @@ export default function BarcodePrintDialog({
   product: initialProduct,
   products = [],
 }: BarcodePrintDialogProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [labelSize, setLabelSize] = useState<'38x25' | '50x25' | 'a4'>('50x25');
@@ -143,8 +146,8 @@ export default function BarcodePrintDialog({
         }
       `}</style>
 
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth fullScreen={isMobile}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1, borderBottom: 1, borderColor: 'divider' }}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <BarcodeIcon color="primary" />
             <Typography variant="h6" fontWeight={700}>
@@ -320,8 +323,8 @@ export default function BarcodePrintDialog({
           </Grid>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={onClose} color="inherit">
+        <DialogActions sx={{ px: 3, py: 2, position: 'sticky', bottom: 0, zIndex: 10, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+          <Button onClick={onClose} color="inherit" fullWidth={isMobile} sx={{ minHeight: 44, borderRadius: 2 }}>
             إلغاء
           </Button>
           <Button
@@ -329,7 +332,8 @@ export default function BarcodePrintDialog({
             color="primary"
             startIcon={<PrintIcon />}
             onClick={handlePrint}
-            sx={{ px: 3, fontWeight: 700 }}
+            fullWidth={isMobile}
+            sx={{ px: 3, fontWeight: 700, minHeight: 44, borderRadius: 2 }}
           >
             طباعة الملصقات ({quantity})
           </Button>

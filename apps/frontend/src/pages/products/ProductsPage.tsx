@@ -29,6 +29,7 @@ import {
   Fab,
   alpha,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -67,6 +68,7 @@ const columns: { id: SortField; label: string; sortable: boolean }[] = [
 export default function ProductsPage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -286,7 +288,7 @@ export default function ProductsPage() {
 
       <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table sx={{ minWidth: 700 }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox" />
